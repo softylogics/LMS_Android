@@ -11,4 +11,7 @@
     <color name="buttonbg">#005FFF</color>
     <color name="buttontext">#FFFFFF</color>
     <color name="appbackground">#FCFCFC</color>
+    <color name="primary">#6750A4</color>
+    <color name="secondaryBackground">#FEF7FF</color>
+    <color name="textColor">#000000</color>
 </resources>

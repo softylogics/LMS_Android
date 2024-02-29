@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="70dp"
+    app:cardElevation="1dp"
+
+    android:layout_margin="8dp">
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:orientation="horizontal"
+      android:layout_gravity="center_vertical"
+      android:layout_height="wrap_content">
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/nestedItemTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/roboto_light"
+            android:text="Grocery and Stationary"
+            android:textColor="@color/textColor"
+            android:textSize="16sp"
+
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtNestedLectureLength"
+            android:text = "20 min"
+            android:fontFamily="@font/roboto_light"
+            android:textColor="#8c8c8c"
+            android:textSize="16sp"
+
+            android:textStyle="bold"/>
+
+
+
+    </LinearLayout>
+
+      <ImageView
+
+
+          android:layout_width="32dp"
+          android:layout_height="32dp"
+          android:src="@drawable/icon_download"
+          android:layout_gravity="right"/>
+  </LinearLayout>
+
+</androidx.cardview.widget.CardView>
