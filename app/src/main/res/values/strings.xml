@@ -5,4 +5,5 @@
     <string name="title_notifications">Notifications</string>
     <string name="title_my_courses">My Course</string>
     <string name="title_account">Account</string>
+    <string name="title_my_course">My Courses</string>
 </resources>
