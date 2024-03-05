@@ -6,7 +6,7 @@
     app:startDestination="@+id/navigation_my_courses">
 
     <fragment
-        android:id="@+id/navigation_my_course"
+        android:id="@+id/navigation_my_courses"
         android:name="com.dusre.lms.ui.mycourse.MyCourseFragment"
         android:label="@string/title_my_course"
         tools:layout="@layout/fragment_my_course" />
@@ -15,7 +15,7 @@
 
     <fragment
         android:id="@+id/navigation_account"
-        android:name="com.dusre.lms.ui.notifications.AccountFragment"
+        android:name="com.dusre.lms.ui.account.AccountFragment"
         android:label="@string/title_account"
         tools:layout="@layout/fragment_account" />
 </navigation>

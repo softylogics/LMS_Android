@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.dusre.lms.databinding.FragmentMyCourseBinding;
@@ -30,7 +31,7 @@ public class MyCourseFragment extends Fragment {
 
         binding = FragmentMyCourseBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        binding.recyclerViewMyCourses.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.recyclerViewMyCourses.setLayoutManager(new GridLayoutManager(requireContext(), 2));
 
         // Initialize course list and adapter
         courseList = new ArrayList<>();

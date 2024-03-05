@@ -7,7 +7,7 @@
     android:orientation="vertical"
 
 
-    tools:context=".ui.notifications.AccountFragment">
+    tools:context=".ui.account.AccountFragment">
 <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent">

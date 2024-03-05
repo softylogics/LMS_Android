@@ -14,4 +14,6 @@
     <color name="primary">#6750A4</color>
     <color name="secondaryBackground">#FEF7FF</color>
     <color name="textColor">#000000</color>
+    <color name="selected_icon_color">#FF0000</color> <!-- Replace with your selected icon color -->
+    <color name="unselected_icon_color">#808080</color> <!-- Replace with your unselected icon color -->
 </resources>

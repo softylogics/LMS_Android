@@ -1,4 +1,4 @@
-package com.dusre.lms.ui.notifications;
+package com.dusre.lms.ui.account;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
