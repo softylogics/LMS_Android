@@ -3,22 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="8dp"
+    android:layout_marginLeft="10dp"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/rounded_bg_course_item"
     app:cardCornerRadius="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp"
 
-        android:background="@drawable/rounded_bg_course_item">
+
+        >
 
         <!-- Course Image -->
         <ImageView
             android:id="@+id/image_course"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="wrap_content"
             android:scaleType="centerCrop"
             android:src="@drawable/btnbg" />
 
@@ -31,13 +33,17 @@
             android:fontFamily="@font/roboto"
             android:text="Course Title"
             android:textColor="@color/textColor"
-            android:textSize="10sp" />
+            android:paddingHorizontal="10dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textSize="13sp" />
 
         <!-- Rating Widget -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:paddingHorizontal="10dp"
             android:orientation="horizontal">
 
             <!-- Star Rating -->
@@ -47,10 +53,13 @@
                 android:layout_height="wrap_content"
                 android:numStars="5"
                 android:stepSize="1"
-                android:rating="0"
-                style="?android:attr/ratingBarStyleSmall"
+                android:rating="3"
 
-                android:isIndicator="true"/>
+                style="@style/Widget.AppCompat.RatingBar.Small"
+
+                />
+
+
 
             <!-- Numeric Rating -->
             <TextView
@@ -58,46 +67,55 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="0.0"
-                android:textSize="10sp"
+                android:text="(0.0)"
+                android:fontFamily="@font/roboto_light"
+                android:textSize="11sp"
                 android:textColor="@android:color/black" />
         </LinearLayout>
-
+        <!-- Progress Bar -->
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:max="100"
+            />
         <!-- Progress Bar with percentage -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:paddingHorizontal="10dp"
             android:orientation="horizontal">
 
             <!-- Numerical Percentage -->
             <TextView
                 android:id="@+id/txt_progress_percentage"
+                android:layout_weight="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0%"
-                android:textSize="10sp"
+                android:text="0% completed"
+                android:fontFamily="@font/roboto_light"
+                android:textSize="11sp"
+
                 android:textColor="@android:color/black" />
 
-            <!-- Progress Bar -->
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:max="100"
-                android:progress="0" />
+
 
             <!-- Completed Lectures -->
             <TextView
+                android:layout_weight="1"
                 android:id="@+id/txt_completed_lectures"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0/0"
-                android:textSize="10sp"
+                android:gravity="right"
+                android:fontFamily="@font/roboto_light"
+                android:textSize="11sp"
+
                 android:textColor="@android:color/black" />
         </LinearLayout>
 

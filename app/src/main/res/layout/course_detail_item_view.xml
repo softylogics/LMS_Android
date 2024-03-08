@@ -15,7 +15,7 @@
         android:orientation="vertical"
         android:id="@+id/linear_layout"
         android:padding="20dp"
-        android:background="@drawable/rounded_bg_course_item">
+        android:background="@drawable/rounded_bg_item_account">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -46,7 +46,7 @@
                     android:layout_height="wrap_content">
 
                     <Button
-
+                        android:id="@+id/btnLessonTiming"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="00:58:00"
@@ -59,7 +59,7 @@
                         />
 
                     <Button
-
+                        android:id="@+id/btnTotalLessons"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="2 Lessons"
@@ -84,10 +84,10 @@
                 android:layout_gravity="center_vertical"
                 android:orientation="vertical">
                 <ImageView
-                    android:id="@+id/arro_imageview"
+                    android:id="@+id/arrow_imageview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@android:drawable/arrow_down_float"
+                    android:src="@drawable/baseline_keyboard_arrow_down_24"
                     android:layout_gravity="right"
                     />
 

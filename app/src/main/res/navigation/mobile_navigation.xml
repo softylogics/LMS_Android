@@ -7,15 +7,50 @@
 
     <fragment
         android:id="@+id/navigation_my_courses"
-        android:name="com.dusre.lms.ui.mycourse.MyCourseFragment"
+        android:name="com.dusre.lms.ui.MyCourseFragment"
         android:label="@string/title_my_course"
-        tools:layout="@layout/fragment_my_course" />
-
+        tools:layout="@layout/fragment_my_course" >
+        <action
+            android:id="@+id/action_navigation_my_courses_to_navigation_course_details"
+            app:destination="@id/navigation_sections" />
+        <action
+            android:id="@+id/action_navigation_my_courses_to_navigation_account"
+            app:destination="@id/navigation_account" />
+    </fragment>
 
 
     <fragment
+        android:id="@+id/navigation_sections"
+        android:name="com.dusre.lms.ui.SectionsFragment"
+        android:label="@string/title_sections"
+        tools:layout="@layout/course_detail_layout" >
+        <action
+            android:id="@+id/action_navigation_course_details_to_navigation_my_courses"
+            app:destination="@id/navigation_my_courses" />
+        <action
+            android:id="@+id/action_navigation_sections_to_navigation_video_player"
+            app:destination="@id/navigation_video_player" />
+
+    </fragment>
+    <fragment
         android:id="@+id/navigation_account"
-        android:name="com.dusre.lms.ui.account.AccountFragment"
+        android:name="com.dusre.lms.ui.AccountFragment"
         android:label="@string/title_account"
-        tools:layout="@layout/fragment_account" />
+        tools:layout="@layout/fragment_account" >
+        <action
+            android:id="@+id/action_navigation_account_to_navigation_my_courses"
+            app:destination="@id/navigation_my_courses" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_video_player"
+        android:name="com.dusre.lms.ui.VideoPlayerFragment"
+        android:label="@string/title_sections"
+        tools:layout="@layout/fragment_player_layout" >
+
+        <action
+            android:id="@+id/action_navigation_video_player_to_navigation_sections"
+            app:destination="@id/navigation_sections" />
+    </fragment>
+
 </navigation>

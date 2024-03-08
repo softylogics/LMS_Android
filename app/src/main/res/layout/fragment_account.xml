@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context=".ui.account.AccountFragment">
+    tools:context=".ui.AccountFragment"
+    android:background="#B0F6F2F2">
 
    <com.google.android.material.imageview.ShapeableImageView
        android:id="@+id/imvCircular"
@@ -50,7 +51,7 @@
 
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_medium"
+                android:fontFamily="@font/roboto"
                 android:text="Edit Profile"
                 android:paddingStart="20dp"
                 android:textColor="@color/textColor"
@@ -71,8 +72,8 @@
              android:scaleType="fitXY"
              android:paddingHorizontal="10dp"
              app:tint="@color/primary"
-             android:backgroundTint="#F8F5F5"
-             android:background="@drawable/rounded_bg_course_item"
+
+             android:background="@drawable/rounded_bg_item_account"
              />
       </LinearLayout>
    <LinearLayout
@@ -99,7 +100,7 @@
 
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:fontFamily="@font/roboto_medium"
+          android:fontFamily="@font/roboto"
           android:text="Downloaded Courses"
           android:paddingStart="20dp"
           android:textColor="@color/textColor"
@@ -121,7 +122,7 @@
           android:paddingHorizontal="10dp"
           app:tint="@color/primary"
           android:backgroundTint="#F8F5F5"
-          android:background="@drawable/rounded_bg_course_item"
+          android:background="@drawable/rounded_bg_item_account"
           />
    </LinearLayout>
    <LinearLayout
@@ -147,7 +148,7 @@
 
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:fontFamily="@font/roboto_medium"
+       android:fontFamily="@font/roboto"
        android:text="Log Out"
        android:paddingStart="20dp"
        android:textColor="@color/textColor"
@@ -169,7 +170,7 @@
        android:paddingHorizontal="10dp"
        app:tint="@color/primary"
        android:backgroundTint="#F8F5F5"
-       android:background="@drawable/rounded_bg_course_item"
+       android:background="@drawable/rounded_bg_item_account"
        />
 </LinearLayout>
 
