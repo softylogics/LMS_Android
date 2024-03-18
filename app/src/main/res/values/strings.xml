@@ -7,4 +7,6 @@
     <string name="title_account">Account</string>
     <string name="title_my_course">My Courses</string>
     <string name="title_sections">Course Detail</string>
+    <string name="download_permission_explaination">In order to download files, you need to grant us permission to your storage. After granting us access, you may go ahead and download the file.</string>
+    <string name="download_permission_grant">Grant permission</string>
 </resources>

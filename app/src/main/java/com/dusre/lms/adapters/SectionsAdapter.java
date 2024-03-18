@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.dusre.lms.R;
+import com.dusre.lms.Util.Constants;
 import com.dusre.lms.databinding.CourseDetailItemViewBinding;
 import com.dusre.lms.listeners.SetOnClickListener;
 import com.dusre.lms.model.Course;
@@ -29,6 +30,8 @@ public class SectionsAdapter extends RecyclerView.Adapter<SectionsAdapter.Course
     private final SetOnClickListener listener;
 
     private List<Lesson> lessons;
+
+
 
     public SectionsAdapter(Context context, SectionsViewModel sectionsViewModel, SetOnClickListener listener) {
         this.sectionsViewModel = sectionsViewModel;
@@ -57,12 +60,7 @@ public class SectionsAdapter extends RecyclerView.Adapter<SectionsAdapter.Course
         Section section = this.sectionsViewModel.getSections().getValue().get(position);
 
         holder.bind(section);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                listener.onItemClickCourseSection(position);
-            }
-        });
+
 
         boolean isExpandable = section.isExpandable();
         holder.binding.expandableLayout.setVisibility(isExpandable ? View.VISIBLE : View.GONE);
@@ -76,13 +74,13 @@ public class SectionsAdapter extends RecyclerView.Adapter<SectionsAdapter.Course
         holder.binding.childRv.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext()));
         holder.binding.childRv.setHasFixedSize(true);
         holder.binding.childRv.setAdapter(adapter);
-        holder.binding.linearLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                section.setIs_expandable(!section.isExpandable());
-                lessons = section.getLessons();
-                notifyItemChanged(holder.getAdapterPosition());
-            }
+        holder.binding.arrowImageview.setOnClickListener(v -> {
+
+            section.setIs_expandable(!section.isExpandable());
+            lessons = section.getLessons();
+            Constants.current_section_id = position;
+
+            notifyItemChanged(holder.getAdapterPosition());
         });
     }
 
@@ -102,7 +100,7 @@ public class SectionsAdapter extends RecyclerView.Adapter<SectionsAdapter.Course
 
         public void bind(Section section) {
             binding.txtModuleTitle.setText(section.getTitle());
-            binding.btnTotalLessons.setText(String.valueOf(section.getLesson_counter_ends()-section.getLesson_counter_starts()) + " Lessons");
+            binding.btnTotalLessons.setText(section.getLessons().size() + " Lessons");
             binding.btnLessonTiming.setText(section.getTotal_duration());
 
 

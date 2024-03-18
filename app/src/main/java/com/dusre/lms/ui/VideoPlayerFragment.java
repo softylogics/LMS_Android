@@ -1,5 +1,6 @@
 package com.dusre.lms.ui;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,11 +10,15 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.media3.common.MediaItem;
+import androidx.media3.exoplayer.ExoPlayer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.android.volley.VolleyError;
+import com.dusre.lms.R;
 import com.dusre.lms.Util.APIClient;
 import com.dusre.lms.Util.Constants;
+import com.dusre.lms.adapters.NextVideoAdapter;
 import com.dusre.lms.adapters.SectionsAdapter;
 import com.dusre.lms.databinding.CourseDetailLayoutBinding;
 import com.dusre.lms.databinding.FragmentPlayerLayoutBinding;
@@ -25,6 +30,7 @@ import com.dusre.lms.model.Section;
 import com.dusre.lms.viewmodel.LessonsViewModel;
 import com.dusre.lms.viewmodel.SectionsViewModel;
 import com.dusre.lms.viewmodel.CoursesViewModel;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -42,7 +48,8 @@ public class VideoPlayerFragment extends Fragment implements SetOnClickListener 
     private SectionsViewModel sectionsViewModel;
     private LessonsViewModel lessonsViewModel;
     private Gson gson;
-
+    private ExoPlayer player;
+    private NextVideoAdapter adapter;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -55,22 +62,23 @@ public class VideoPlayerFragment extends Fragment implements SetOnClickListener 
         coursesViewModel = new ViewModelProvider(requireActivity()).get(CoursesViewModel.class);
         sectionsViewModel = new ViewModelProvider(requireActivity()).get(SectionsViewModel.class);
         lessonsViewModel = new ViewModelProvider(requireActivity()).get(LessonsViewModel.class);
-
+        initializePlayer();
+        binding.recyclerViewNextVideos.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new NextVideoAdapter(getContext(), lessonsViewModel, this);
+        binding.recyclerViewNextVideos.setAdapter(adapter);
         // Initialize course list and adapter
         //todo: add if else for network data fetch
 
 
         gson = new Gson();
-        // Populate course list (You may fetch it from database or API)
 
-//        final TextView textView = binding.textHome;
-//        myCourseViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-        return root;
+       return root;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        player.release();
         binding = null;
     }
 
@@ -86,17 +94,45 @@ public class VideoPlayerFragment extends Fragment implements SetOnClickListener 
 
     @Override
     public void onCheckBoxClick(int position) {
-        //todo: complete this checkbox functionality
+
     }
 
     @Override
     public void onDownloadButtonClick(int position) {
-        //todo: complete download functionality
+
     }
 
     @Override
     public void onLessonNameClick(int position) {
-        //todo: complete this
 
+
+
+
+    }
+
+    @Override
+    public void onNextLessonClick(int position) {
+        Constants.current_lesson_id = position;
+        MediaItem mediaItem = MediaItem.fromUri(lessonsViewModel.getMyLessons().getValue().get(position).getVideo_url_web());
+// Set the media item to be played.
+        player.setMediaItem(mediaItem);
+// Prepare the player.
+        player.prepare();
+// Start the playback.
+        player.play();
+    }
+
+    private void initializePlayer() {
+        player = new ExoPlayer.Builder(getContext()).build();
+        // Bind the player to the view.
+        binding.exoplayerView.setPlayer(player);
+        // Build the media item.
+        MediaItem mediaItem = MediaItem.fromUri(lessonsViewModel.getMyLessons().getValue().get(Constants.current_lesson_id).getVideo_url_web());
+// Set the media item to be played.
+        player.setMediaItem(mediaItem);
+// Prepare the player.
+        player.prepare();
+// Start the playback.
+        player.play();
     }
 }

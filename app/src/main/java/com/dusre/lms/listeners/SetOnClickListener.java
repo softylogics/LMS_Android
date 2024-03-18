@@ -10,4 +10,6 @@ public interface SetOnClickListener {
     void onDownloadButtonClick(int position);
 
     void onLessonNameClick(int position);
+
+    void onNextLessonClick(int position);
 }

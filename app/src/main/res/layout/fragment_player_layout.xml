@@ -1,24 +1,46 @@
 <!-- fragment_youtube_player.xml -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <com.google.android.exoplayer2.ui.PlayerView
+<!--    <androidx.media3.ui.PlayerView-->
+<!--        android:id="@+id/player_view"-->
+<!--        android:background="@color/player_background"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        app:artwork_display_mode="fill"-->
+<!--        app:default_artwork="@drawable/artwork_placeholder"-->
+<!--        app:repeat_toggle_modes="one|all"-->
+<!--        app:show_shuffle_button="true"-->
+<!--        app:shutter_background_color="@color/player_background" />-->
+    <androidx.media3.ui.PlayerView
         android:id="@+id/exoplayer_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#000000"
         app:controller_layout_id="@layout/custom_playback_view"
-        app:fastforward_increment="10000"
+
         app:show_buffering="when_playing"
         app:buffered_color="@color/unselected_icon_color"
         app:hide_on_touch="false"
         app:player_layout_id="@layout/exo_layout_view"
         app:resize_mode="fit"
-        app:rewind_increment="10000"
+
         app:show_timeout="4000"
         app:shutter_background_color="#000000"
         app:surface_type="surface_view"
         app:use_controller="true" />
-</RelativeLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewNextVideos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:paddingTop="16dp"
+        android:clipToPadding="false"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:background="@color/appbackground"
+        android:paddingBottom="16dp" />
+</LinearLayout>

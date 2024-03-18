@@ -9,6 +9,7 @@ import android.widget.CompoundButton;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.dusre.lms.Util.Constants;
 import com.dusre.lms.databinding.CourseDetailNestedItemViewBinding;
 import com.dusre.lms.listeners.SetOnClickListener;
 import com.dusre.lms.model.Lesson;
@@ -64,6 +65,7 @@ public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.CourseVi
         holder.binding.lessonLinearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Constants.current_lesson_id = position;
                 listener.onLessonNameClick(position);
             }
         });

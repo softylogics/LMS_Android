@@ -136,4 +136,9 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
     public void onLessonNameClick(int position) {
 
     }
+
+    @Override
+    public void onNextLessonClick(int position) {
+
+    }
 }
