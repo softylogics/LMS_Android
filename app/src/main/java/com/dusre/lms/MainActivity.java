@@ -3,6 +3,9 @@ package com.dusre.lms;
 import android.os.Bundle;
 
 import com.dusre.lms.viewmodel.CoursesViewModel;
+import com.dusre.lms.viewmodel.DownloadedVideoViewModel;
+import com.dusre.lms.viewmodel.LessonsViewModel;
+import com.dusre.lms.viewmodel.SectionsViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +21,9 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private CoursesViewModel coursesViewModel;
+    private SectionsViewModel sectionsViewModel;
+    private LessonsViewModel lessonsViewModel;
+    private DownloadedVideoViewModel downloadedVideoViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +32,10 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         coursesViewModel = new ViewModelProvider(this).get(CoursesViewModel.class);
+        sectionsViewModel = new ViewModelProvider(this).get(SectionsViewModel.class);
+        lessonsViewModel = new ViewModelProvider(this).get(LessonsViewModel.class);
+        downloadedVideoViewModel = new ViewModelProvider(this).get(DownloadedVideoViewModel.class);
+
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.

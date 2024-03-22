@@ -3,8 +3,11 @@ package com.dusre.lms.ui;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,11 +30,14 @@ import com.android.volley.VolleyError;
 import com.dusre.lms.R;
 import com.dusre.lms.Util.APIClient;
 import com.dusre.lms.Util.Constants;
+import com.dusre.lms.Util.DatabaseHelper;
 import com.dusre.lms.adapters.SectionsAdapter;
 import com.dusre.lms.databinding.CourseDetailLayoutBinding;
 import com.dusre.lms.listeners.SetOnClickListener;
 import com.dusre.lms.model.Course;
 
+import com.dusre.lms.model.DownloadedVideo;
+import com.dusre.lms.model.Lesson;
 import com.dusre.lms.model.Section;
 import com.dusre.lms.viewmodel.LessonsViewModel;
 import com.dusre.lms.viewmodel.SectionsViewModel;
@@ -49,6 +56,7 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class SectionsFragment extends Fragment implements SetOnClickListener {
 
@@ -62,6 +70,10 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
     private Gson gson;
     private NavController navController;
     private ProgressDialog pDialog;
+
+    private DownloadedVideo downloadedVideo;
+    private DatabaseHelper dbHelper;
+    private String videoId = "";
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -86,7 +98,13 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         binding.recyclerViewCourseDetail.setAdapter(sectionsAdapter);
         gson = new Gson();
         // Populate course list (You may fetch it from database or API)
-        callAPIForCoursesSections();
+        if(checkInternet()!=0) {
+            callAPIForCoursesSections();
+        }
+        else{
+            Toast.makeText(getContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+        }
+        dbHelper = new DatabaseHelper(getContext());
 //        final TextView textView = binding.textHome;
 //        myCourseViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
@@ -158,18 +176,54 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
     @Override
     public void onDownloadButtonClick(int position) {
         //todo: complete download functionality
-
+        lessonsViewModel.setMyLessons(sectionsViewModel.getSections().getValue().get(Constants.current_section_id).getLessons());
         if(hasPermissionToDownload(getActivity())){
-            new DownloadFileFromURL().execute(lessonsViewModel.getMyLessons().getValue().get(position).getVideo_url_web());
+            if(checkInternet()!=0) {
+                videoId = UUID.randomUUID().toString();
 
+                Lesson lesson = lessonsViewModel.getMyLessons().getValue().get(position);
+                downloadedVideo = new DownloadedVideo();
+                downloadedVideo.setId(videoId);
+                downloadedVideo.setTitle(lesson.getTitle());
+                downloadedVideo.setDuration(lesson.getDuration());
+                downloadedVideo.setCourse_id(lesson.getCourse_id());
+                downloadedVideo.setCourse_title(getCourseTitle(lesson.getCourse_id()));
+                downloadedVideo.setSection_id(lesson.getSection_id());
+                downloadedVideo.setSection_title(getSectionTitle(lesson.getSection_id()));
+
+                new DownloadFileFromURL().execute(lesson.getVideo_url_web());
+            }
+            else{
+                Toast.makeText(getContext(), "No Internet Connection", Toast.LENGTH_SHORT).show();
+            }
         }
+    }
+
+    private String getCourseTitle(String courseId) {
+
+        for(Course course: coursesViewModel.getMyCourses().getValue()){
+            if(course.getId().equals(courseId)){
+                return course.getTitle();
+            }
+        }
+        return null;
+    }
+
+    private String getSectionTitle(String sectionId) {
+        for(Section section: sectionsViewModel.getSections().getValue()){
+            if(section.getId().equals(sectionId)){
+                return section.getTitle();
+            }
+        }
+        return null;
     }
 
     @Override
     public void onLessonNameClick(int position) {
         //todo: complete this
+        Constants.isDownloadVideoPlay = false;
         Constants.current_lesson_id = position;
-        lessonsViewModel.setMyLessons(sectionsViewModel.getSections().getValue().get(position).getLessons());
+        lessonsViewModel.setMyLessons(sectionsViewModel.getSections().getValue().get(Constants.current_section_id).getLessons());
 
         navController.navigate(R.id.action_navigation_sections_to_navigation_video_player);
 
@@ -179,6 +233,27 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
     public void onNextLessonClick(int position) {
 
     }
+
+    @Override
+    public void onDownloadedItemClickCourse(int position) {
+
+    }
+
+    @Override
+    public void onDownloadedLessonNameClick(int position) {
+
+    }
+
+    @Override
+    public void onDownloadedNextLessonClick(int position) {
+
+    }
+
+    @Override
+    public void onDownloadDeleteVideo(int position) {
+
+    }
+
     public static boolean hasPermissionToDownload(final Activity context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Build.VERSION.SDK_INT >= 29 ||
                 ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -222,6 +297,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         @Override
         protected String doInBackground(String... f_url) {
             int count;
+            File file = null;
             try {
                 URL url = new URL(f_url[0]);
 
@@ -248,7 +324,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
                         // Directory created successfully or already exists
                         // Now you can save files into this directory
                         // Create a new file in the specified directory
-                        File file = new File(directory, name);
+                        file = new File(directory, name);
 
                         // Output stream to write file
                         OutputStream output = new FileOutputStream(file);
@@ -281,7 +357,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
                     // Directory already exists
                     // You can proceed to save files into this directory
                     // Create a new file in the specified directory
-                    File file = new File(directory, name);
+                    file = new File(directory, name);
 
                     // Output stream to write file
                     OutputStream output = new FileOutputStream(file);
@@ -313,8 +389,12 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
             } catch (Exception e) {
                 Log.e("Error: ", e.getMessage());
             }
-
-            return null;
+            if(file!=null) {
+                return file.getAbsolutePath();
+            }
+            else{
+                return null;
+            }
         }
 
         /**
@@ -332,11 +412,54 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         @Override
         protected void onPostExecute(String file_url) {
             // dismiss the dialog after the file was downloaded
+
+
+            // Find the index of "/files/"
+            int filesIndex = file_url.indexOf("/files/");
+
+                // Extract the substring after "/files/"
+                String substringAfterFiles = file_url.substring(filesIndex + "/files/".length());
+
+
+            downloadedVideo.setVideo_file_path(substringAfterFiles);
+            dbHelper.addDownloadedVideo(downloadedVideo);
             pDialog.dismiss();
 
+        }
+        @Override
+        protected void onCancelled(String file_url) {
+            // If the download was cancelled, you can clean up resources here
+            // Delete the partially downloaded file if it exists
+            if (file_url != null) {
+                File file = new File(file_url);
+                if (file.exists()) {
+                    file.delete();
+                }
+            }
+            dbHelper.deleteDownloadedVideo(videoId);
+            // Dismiss the progress dialog
+            pDialog.dismiss();
         }
 
     }
 
+    private int checkInternet() {
+        int result = 0; // Returns connection type. 0: none; 1: mobile data; 2: wifi
+        ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            NetworkCapabilities capabilities = cm.getNetworkCapabilities(cm.getActiveNetwork());
+            if (capabilities != null) {
+                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    result = 2;
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                    result = 1;
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+                    result = 3;
+                }
+            }
+        }
+        return result;
 
+
+    }
 }

@@ -6,4 +6,8 @@ public class Constants {
     public static int current_course_id = 0;
     public static int current_section_id = 0;
     public static int current_lesson_id = 0;
+    public static int current_downloaded_course_id = 0;
+    public static int current_downloaded_lesson_id = 0;
+    public static int current_downloaded_section_id = 0;
+    public static boolean isDownloadVideoPlay = false;
 }

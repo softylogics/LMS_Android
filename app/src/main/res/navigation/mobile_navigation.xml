@@ -40,6 +40,9 @@
         <action
             android:id="@+id/action_navigation_account_to_navigation_my_courses"
             app:destination="@id/navigation_my_courses" />
+        <action
+            android:id="@+id/action_navigation_account_to_navigation_downloaded_videos"
+            app:destination="@id/navigation_downloaded_videos" />
     </fragment>
 
     <fragment
@@ -52,5 +55,34 @@
             android:id="@+id/action_navigation_video_player_to_navigation_sections"
             app:destination="@id/navigation_sections" />
     </fragment>
+
+    <fragment
+        android:id="@+id/navigation_downloaded_videos"
+        android:name="com.dusre.lms.ui.DownloadedVideoFragment"
+        android:label="@string/title_downloaded_videos"
+        tools:layout="@layout/fragment_downloaded_courses" >
+        <action
+            android:id="@+id/action_navigation_downloaded_courses_to_navigation_downloaded_course_details"
+            app:destination="@id/navigation_downloaded_sections" />
+
+
+        <action
+            android:id="@+id/action_navigation_downloaded_videos_to_navigation_account"
+            app:destination="@id/navigation_account" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_downloaded_sections"
+        android:name="com.dusre.lms.ui.DownloadedSectionsFragment"
+        android:label="@string/title_downloaded_sections"
+        tools:layout="@layout/downloaded_course_detail_layout" >
+        <action
+            android:id="@+id/action_navigation_downloaded_course_details_to_navigation_downloaded_courses"
+            app:destination="@id/navigation_downloaded_videos" />
+        <action
+            android:id="@+id/action_navigation_downloaded_sections_to_navigation_video_player"
+            app:destination="@id/navigation_video_player" />
+
+    </fragment>
+
 
 </navigation>

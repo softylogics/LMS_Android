@@ -141,4 +141,24 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
     public void onNextLessonClick(int position) {
 
     }
+
+    @Override
+    public void onDownloadedItemClickCourse(int position) {
+
+    }
+
+    @Override
+    public void onDownloadedLessonNameClick(int position) {
+
+    }
+
+    @Override
+    public void onDownloadedNextLessonClick(int position) {
+
+    }
+
+    @Override
+    public void onDownloadDeleteVideo(int position) {
+
+    }
 }

@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:id="@+id/linear_layout"
+        android:id="@+id/downloaded_linear_layout"
         android:padding="20dp"
         android:background="@drawable/rounded_bg_course_item">
 
@@ -29,7 +29,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/txt_module_title"
+                    android:id="@+id/txt_downloaded_module_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
@@ -55,7 +55,7 @@
                 android:layout_gravity="center_vertical"
                 android:orientation="vertical">
                 <ImageView
-                    android:id="@+id/arro_imageview"
+                    android:id="@+id/downloaded_arro_imageview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@android:drawable/arrow_down_float"
@@ -75,10 +75,10 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/expandable_layout">
+            android:id="@+id/downloaded_expandable_layout">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/child_rv"
+                android:id="@+id/downloaded_child_rv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </RelativeLayout>
