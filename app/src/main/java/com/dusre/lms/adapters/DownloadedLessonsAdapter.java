@@ -27,7 +27,7 @@ public class DownloadedLessonsAdapter extends RecyclerView.Adapter<DownloadedLes
 
     private List<DownloadedLesson> lessons;
 
-    public DownloadedLessonsAdapter(Context context, List<DownloadedLesson> lessons,SetOnClickListener listener) {
+    public DownloadedLessonsAdapter(Context context, List<DownloadedLesson> lessons, SetOnClickListener listener) {
 
         this.context = context;
         this.lessons = lessons;

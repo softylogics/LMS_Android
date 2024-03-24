@@ -33,24 +33,26 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
-                    android:fontFamily="@font/roboto_medium"
+                    android:fontFamily="@font/roboto_light"
                     android:gravity="center"
                     android:text="Module Title"
                     android:textColor="#000000"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textSize="15sp"
+                    />
 
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnLessonTiming"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="35dp"
                         android:text="00:58:00"
-                        android:textSize="10sp"
+                        android:textSize="8sp"
+
+                        android:fontFamily="@font/roboto_light"
                         android:textColor="#FFFFFF"
                         android:layout_marginRight="10dp"
                         android:backgroundTint="@color/primary"
@@ -59,12 +61,14 @@
                         />
 
                     <Button
+
                         android:id="@+id/btnTotalLessons"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="35dp"
                         android:text="2 Lessons"
-                        android:textSize="10sp"
+                        android:textSize="8sp"
                         android:textColor="#FFFFFF"
+                        android:fontFamily="@font/roboto_light"
                         android:backgroundTint="@color/primary"
                         />
 

@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="CustomButton" parent="Widget.AppCompat.Button">
+        <item name="android:paddingStart">8dp</item> <!-- Set the start padding -->
+        <item name="android:paddingEnd">8dp</item> <!-- Set the end padding -->
+        <item name="android:paddingTop">0dp</item> <!-- Set the top padding -->
+        <item name="android:paddingBottom">0dp</item> <!-- Set the bottom padding -->
+    </style>
+
 
 
 </resources>

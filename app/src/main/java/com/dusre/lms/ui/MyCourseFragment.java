@@ -20,6 +20,7 @@ import com.dusre.lms.MainActivity;
 import com.dusre.lms.R;
 import com.dusre.lms.Util.APIClient;
 import com.dusre.lms.Util.Constants;
+import com.dusre.lms.Util.UserPreferences;
 import com.dusre.lms.databinding.FragmentMyCourseBinding;
 import com.dusre.lms.adapters.MyCoursesAdapter;
 import com.dusre.lms.listeners.SetOnClickListener;
@@ -51,7 +52,7 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
 
         binding = FragmentMyCourseBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
+        UserPreferences.init(getContext());
         binding.recyclerViewMyCourses.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         MainActivity activity = (MainActivity) requireActivity();
         coursesViewModel = new ViewModelProvider(requireActivity()).get(CoursesViewModel.class);
@@ -97,7 +98,7 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
 
 
         Map<String, String> params = new HashMap<>();
-        params.put("auth_token", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMTY2MyIsImZpcnN0X25hbWUiOiJNaXJ6YSIsImxhc3RfbmFtZSI6IlRlc3QiLCJlbWFpbCI6Im1pcnphQHRlc3QuY29tIiwicm9sZSI6InVzZXIiLCJ2YWxpZGl0eSI6MX0.WDmRKPtUJNN0WKXdEbBhNg-zpAEE2sMWNqvrFdw_gV4");
+        params.put("auth_token", UserPreferences.getString(Constants.TOKEN));
 
         myVolleyApiClient.fetchDataFromApi(Constants.url+"my_courses", params, listener);
     }

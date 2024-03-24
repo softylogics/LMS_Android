@@ -2,6 +2,9 @@ package com.dusre.lms.Util;
 
 public class Constants {
 
+    public static final String LOGGED_IN = "loggesIn";
+    public static final String TOKEN = "token";
+    public static final String USERNAME = "username";
     public static String url = "https://virus.sahlaapps.xyz/api/";
     public static int current_course_id = 0;
     public static int current_section_id = 0;

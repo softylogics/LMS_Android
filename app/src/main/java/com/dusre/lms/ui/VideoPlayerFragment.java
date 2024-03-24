@@ -2,12 +2,14 @@ package com.dusre.lms.ui;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.MediaItem;
@@ -156,10 +158,16 @@ public class VideoPlayerFragment extends Fragment implements SetOnClickListener 
             String folderName = "DownloadedVideos";
             List<DownloadedCourse> videos = downloadedVideoViewModel.getDownloadedCourses().getValue();
 
-            String name = videos.get(Constants.current_downloaded_course_id).getDownloadedSections().get(Constants.current_downloaded_section_id).getDownloadedLessons().get(Constants.current_downloaded_lesson_id).getVideoPath();
-            File file = new File(getActivity().getFilesDir(), name);
-            String uri = file.getAbsolutePath();
-            MediaItem mediaItem = MediaItem.fromUri(uri);
+            String path = videos.get(Constants.current_downloaded_course_id).getDownloadedSections().get(Constants.current_downloaded_section_id).getDownloadedLessons().get(Constants.current_downloaded_lesson_id).getVideoPath();
+            String name = path.substring(path.lastIndexOf("/")+1);
+            //            File file = new File(getActivity().getFilesDir(), name);
+            File directory = getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+
+// Create a File object representing the downloaded file
+            File downloadedFile = new File(directory, name);
+//            String uri = downloadedFile.getAbsolutePath();
+            Uri uri = FileProvider.getUriForFile(getContext(), "com.dusre.lms.fileprovider", downloadedFile);
+            MediaItem mediaItem = MediaItem.fromUri(Uri.parse(path));
 // Set the media item to be played.
             player.setMediaItem(mediaItem);
 // Prepare the player.

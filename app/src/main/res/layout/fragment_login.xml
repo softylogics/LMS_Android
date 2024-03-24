@@ -1,20 +1,22 @@
-<!-- register_fragment.xml -->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/appbackground"
+
     android:gravity="center_vertical"
     android:orientation="vertical"
     android:padding="16dp">
 
     <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/login_frag_icon"
         android:layout_gravity="center_horizontal"/>
 
   <TextView
+      android:id="@+id/txtview"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:text="Log in"
@@ -26,6 +28,7 @@
 
 
   <com.google.android.material.textfield.TextInputLayout
+      android:id="@+id/usernameLayout"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:boxStrokeWidth="0dp"
@@ -36,6 +39,7 @@
       >
 
     <EditText
+        android:id="@+id/username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
@@ -43,6 +47,7 @@
         android:background="@drawable/edittextbg"/>
   </com.google.android.material.textfield.TextInputLayout>
   <com.google.android.material.textfield.TextInputLayout
+      android:id="@+id/passwordLayout"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:passwordToggleEnabled="true"
@@ -53,6 +58,7 @@
       >
 
     <EditText
+        android:id="@+id/password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
@@ -68,8 +74,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:alpha="0"
+        android:indeterminateTint="@color/primary"
         android:visibility="visible"
+        android:alpha="0"
 
         />
 

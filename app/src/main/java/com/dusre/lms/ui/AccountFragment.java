@@ -1,5 +1,6 @@
 package com.dusre.lms.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +13,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.dusre.lms.LoginActivity;
 import com.dusre.lms.R;
+import com.dusre.lms.Util.Constants;
+import com.dusre.lms.Util.UserPreferences;
 import com.dusre.lms.databinding.FragmentAccountBinding;
 
 public class AccountFragment extends Fragment {
@@ -35,6 +39,14 @@ public class AccountFragment extends Fragment {
         navController = Navigation.findNavController(view);
         binding.ivDownloaded.setOnClickListener(v->{
             navController.navigate(R.id.action_navigation_account_to_navigation_downloaded_videos);
+        });
+        binding.ivLogout.setOnClickListener(v->{
+            UserPreferences.setBoolean(Constants.LOGGED_IN, false);
+            UserPreferences.setString(Constants.TOKEN, "");
+            UserPreferences.setString(Constants.USERNAME, "");
+            startActivity(new Intent(getActivity(), LoginActivity.class));
+            getActivity().finish();
+
         });
     }
 

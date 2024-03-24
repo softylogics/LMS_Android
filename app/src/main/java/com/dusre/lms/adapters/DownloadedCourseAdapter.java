@@ -78,7 +78,7 @@ public class DownloadedCourseAdapter  extends RecyclerView.Adapter<DownloadedCou
             binding.txtDownloadedCourseTitleItem.setText(downloadedCourse.getCourseTitle());
 
             binding.txtDownlaodedTotalLesson.setText("Total Lessons: " + getTotalLessons(downloadedCourse));
-//            Picasso.get().load(.getThumbnail()).into(binding.imageCourse);
+            Picasso.get().load("https://virus.sahlaapps.xyz/uploads/thumbnails/course_thumbnails/optimized/course_thumbnail_default-new_11703241630.jpg").into(binding.imageCourse);
 
 
         }

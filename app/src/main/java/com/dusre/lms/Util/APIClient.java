@@ -17,6 +17,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import java.util.Locale;
 import java.util.Map;
 
 public class APIClient {
@@ -47,10 +49,34 @@ public class APIClient {
             public void onErrorResponse(VolleyError error) {
                 listener.onFailure(error);
             }
+
+
         });
 
         requestQueue.add(stringRequest);
     }
+
+    public void login(String apiUrl, Map<String, String> params, ApiResponseListener listener) {
+        String formattedUrl = formatUrl(apiUrl, params);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        listener.onSuccess(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                listener.onFailure(error);
+            }
+
+
+        });
+
+        requestQueue.add(stringRequest);
+    }
+
 
     private String formatUrl(String baseUrl, Map<String, String> params) {
         Uri.Builder builder = Uri.parse(baseUrl).buildUpon();
@@ -58,5 +84,13 @@ public class APIClient {
             builder.appendQueryParameter(entry.getKey(), entry.getValue());
         }
         return builder.build().toString();
+    }
+
+    public static String getProgressDisplayLine(long currentBytes, long totalBytes) {
+        return getBytesToMBString(currentBytes) + "/" + getBytesToMBString(totalBytes);
+    }
+
+    private static String getBytesToMBString(long bytes) {
+        return String.format(Locale.ENGLISH, "%.2fMb", bytes / (1024.00 * 1024.00));
     }
 }
