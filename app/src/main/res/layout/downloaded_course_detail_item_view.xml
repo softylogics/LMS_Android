@@ -23,8 +23,8 @@
             android:layout_height="wrap_content">
 
             <LinearLayout
-                android:layout_weight="1"
-                android:layout_width="wrap_content"
+                android:layout_weight="3"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
@@ -33,12 +33,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
-                    android:fontFamily="@font/roboto_medium"
-                    android:gravity="center"
-                    android:text="Module Title"
+                    android:fontFamily="@font/roboto_light"
+                    android:gravity="start"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:text="Communication with client and marketing proposals"
                     android:textColor="#000000"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textSize="15sp"/>
 
 
 
@@ -58,7 +59,7 @@
                     android:id="@+id/downloaded_arro_imageview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@android:drawable/arrow_down_float"
+                    android:src="@drawable/baseline_keyboard_arrow_down_24"
                     android:layout_gravity="right"
                     />
 

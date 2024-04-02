@@ -21,22 +21,23 @@
 
             android:layout_marginRight="30dp"
             android:fontFamily="@font/roboto"
-            android:textSize="15sp"
+            android:textSize="12sp"
             android:text="1"/>
 
 
 
             <TextView
-                android:layout_weight="1"
                 android:id="@+id/txtDownloadedNestedLessonTitle"
+                android:layout_weight="1"
+
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_light"
                 android:text="Grocery and Stationary"
                 android:textColor="@color/textColor"
-                android:textSize="16sp"
+                android:textSize="10sp"
 
-                android:textStyle="bold" />
+                android:textStyle="bold"/>
 
 
 
@@ -47,8 +48,8 @@
         <ImageView
 
             android:id="@+id/downloadedNestedDel"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:src="@drawable/baseline_delete_outline_24"
             android:layout_gravity="right"/>
     </LinearLayout>

@@ -1,6 +1,8 @@
 package com.dusre.lms.ui;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -194,4 +196,5 @@ public class DownloadedVideoFragment extends Fragment implements SetOnClickListe
     public void onDownloadDeleteVideo(int position) {
 
     }
+
 }

@@ -12,10 +12,9 @@
         tools:layout="@layout/fragment_my_course" >
         <action
             android:id="@+id/action_navigation_my_courses_to_navigation_course_details"
-            app:destination="@id/navigation_sections" />
-        <action
-            android:id="@+id/action_navigation_my_courses_to_navigation_account"
-            app:destination="@id/navigation_account" />
+            app:destination="@id/navigation_sections"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/slide_out" />
     </fragment>
 
 
@@ -25,11 +24,10 @@
         android:label="@string/title_sections"
         tools:layout="@layout/course_detail_layout" >
         <action
-            android:id="@+id/action_navigation_course_details_to_navigation_my_courses"
-            app:destination="@id/navigation_my_courses" />
-        <action
             android:id="@+id/action_navigation_sections_to_navigation_video_player"
-            app:destination="@id/navigation_video_player" />
+            app:destination="@id/navigation_video_player"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/slide_out"/>
 
     </fragment>
     <fragment
@@ -38,23 +36,18 @@
         android:label="@string/title_account"
         tools:layout="@layout/fragment_account" >
         <action
-            android:id="@+id/action_navigation_account_to_navigation_my_courses"
-            app:destination="@id/navigation_my_courses" />
-        <action
             android:id="@+id/action_navigation_account_to_navigation_downloaded_videos"
-            app:destination="@id/navigation_downloaded_videos" />
+            app:destination="@id/navigation_downloaded_videos"
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/slide_out"/>
     </fragment>
 
     <fragment
         android:id="@+id/navigation_video_player"
         android:name="com.dusre.lms.ui.VideoPlayerFragment"
         android:label="@string/title_sections"
-        tools:layout="@layout/fragment_player_layout" >
-
-        <action
-            android:id="@+id/action_navigation_video_player_to_navigation_sections"
-            app:destination="@id/navigation_sections" />
-    </fragment>
+        tools:layout="@layout/fragment_player_layout" />
 
     <fragment
         android:id="@+id/navigation_downloaded_videos"
@@ -63,12 +56,12 @@
         tools:layout="@layout/fragment_downloaded_courses" >
         <action
             android:id="@+id/action_navigation_downloaded_courses_to_navigation_downloaded_course_details"
-            app:destination="@id/navigation_downloaded_sections" />
+            app:destination="@id/navigation_downloaded_sections"
+            app:popUpToInclusive="false"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/slide_out"/>
 
 
-        <action
-            android:id="@+id/action_navigation_downloaded_videos_to_navigation_account"
-            app:destination="@id/navigation_account" />
     </fragment>
     <fragment
         android:id="@+id/navigation_downloaded_sections"
@@ -76,11 +69,12 @@
         android:label="@string/title_downloaded_sections"
         tools:layout="@layout/downloaded_course_detail_layout" >
         <action
-            android:id="@+id/action_navigation_downloaded_course_details_to_navigation_downloaded_courses"
-            app:destination="@id/navigation_downloaded_videos" />
-        <action
             android:id="@+id/action_navigation_downloaded_sections_to_navigation_video_player"
-            app:destination="@id/navigation_video_player" />
+            app:destination="@id/navigation_video_player"
+            app:launchSingleTop="false"
+            app:popUpToInclusive="false"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/slide_out"/>
 
     </fragment>
 

@@ -1,10 +1,14 @@
 package com.dusre.lms.ui;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,19 +17,17 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.android.volley.VolleyError;
-import com.dusre.lms.MainActivity;
 import com.dusre.lms.R;
 import com.dusre.lms.Util.APIClient;
 import com.dusre.lms.Util.Constants;
 import com.dusre.lms.Util.UserPreferences;
-import com.dusre.lms.databinding.FragmentMyCourseBinding;
 import com.dusre.lms.adapters.MyCoursesAdapter;
+import com.dusre.lms.databinding.FragmentMyCourseBinding;
 import com.dusre.lms.listeners.SetOnClickListener;
 import com.dusre.lms.model.Course;
-
 import com.dusre.lms.viewmodel.CoursesViewModel;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -39,7 +41,6 @@ import java.util.Map;
 public class MyCourseFragment extends Fragment implements SetOnClickListener {
 
     private FragmentMyCourseBinding binding;
-    private MyCoursesAdapter courseAdapter;
     private List<Course> courseList;
     private CoursesViewModel coursesViewModel;
     private Gson gson;
@@ -54,18 +55,7 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
         View root = binding.getRoot();
         UserPreferences.init(getContext());
         binding.recyclerViewMyCourses.setLayoutManager(new GridLayoutManager(requireContext(), 2));
-        MainActivity activity = (MainActivity) requireActivity();
-        coursesViewModel = new ViewModelProvider(requireActivity()).get(CoursesViewModel.class);
-        // Initialize course list and adapter
-        courseList = new ArrayList<>(); //todo: add if else for network data fetch
-        courseAdapter = new MyCoursesAdapter(requireContext(), courseList, coursesViewModel, this);
 
-        binding.recyclerViewMyCourses.setAdapter(courseAdapter);
-        gson = new Gson();
-        // Populate course list (You may fetch it from database or API)
-        callAPIForCourses();
-//        final TextView textView = binding.textHome;
-//        myCourseViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 
@@ -74,8 +64,52 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
-    }
+        coursesViewModel = new ViewModelProvider(requireActivity()).get(CoursesViewModel.class);
+        // Initialize course list and adapter
+        courseList = new ArrayList<>(); //todo: add if else for network data fetch
+        MyCoursesAdapter courseAdapter = new MyCoursesAdapter(requireContext(), courseList, coursesViewModel, this);
 
+        binding.recyclerViewMyCourses.setAdapter(courseAdapter);
+        gson = new Gson();
+        if(checkInternet()!=0) {
+            if(courseList.isEmpty()) {
+                binding.progressBar.setVisibility(View.VISIBLE);
+                callAPIForCourses();
+            }
+        }
+        else{
+            Toast.makeText(getContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+        }
+
+        binding.swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if(courseList.isEmpty()) {
+                    binding.progressBar.setVisibility(View.VISIBLE);
+                    callAPIForCourses();
+                }
+            }
+        });
+    }
+    private int checkInternet() {
+        int result = 0; // Returns connection type. 0: none; 1: mobile data; 2: wifi
+        ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            NetworkCapabilities capabilities = cm.getNetworkCapabilities(cm.getActiveNetwork());
+            if (capabilities != null) {
+                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    result = 2;
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                    result = 1;
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+                    result = 3;
+                }
+            }
+        }
+        return result;
+
+
+    }
     private void callAPIForCourses() {
         APIClient myVolleyApiClient = new APIClient(getContext());
 
@@ -84,7 +118,7 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
             public void onSuccess(String response) {
                 // Handle successful response
 
-
+                binding.progressBar.setVisibility(View.GONE);
                 coursesViewModel.setMyCourses(parseJsonToCourseList(response));
                 Log.d("API Response", response);
             }
@@ -92,6 +126,7 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
             @Override
             public void onFailure(VolleyError error) {
                 // Handle failure
+                binding.progressBar.setVisibility(View.GONE);
                 Log.d("API Response", error.toString());
             }
         };
@@ -162,4 +197,6 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
     public void onDownloadDeleteVideo(int position) {
 
     }
+
+
 }

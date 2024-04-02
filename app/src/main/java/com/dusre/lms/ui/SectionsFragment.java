@@ -35,6 +35,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.android.volley.VolleyError;
 import com.downloader.Error;
@@ -45,6 +46,7 @@ import com.downloader.OnProgressListener;
 import com.downloader.OnStartOrResumeListener;
 import com.downloader.PRDownloader;
 import com.downloader.Progress;
+import com.dusre.lms.MainActivity;
 import com.dusre.lms.R;
 import com.dusre.lms.Util.APIClient;
 import com.dusre.lms.Util.Constants;
@@ -80,7 +82,6 @@ import java.util.UUID;
 public class SectionsFragment extends Fragment implements SetOnClickListener {
 
     private CourseDetailLayoutBinding binding;
-    private SectionsAdapter sectionsAdapter;
     private List<Course> courseList;
     private CoursesViewModel coursesViewModel;
     private SectionsViewModel sectionsViewModel;
@@ -99,6 +100,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 
     private File file;
     private BroadcastReceiver onDownloadComplete;
+    private int lesson_id = -1;
 
     public SectionsFragment() {
     }
@@ -117,7 +119,9 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         lessonsViewModel = new ViewModelProvider(requireActivity()).get(LessonsViewModel.class);
         // Initialize course list and adapter
         //todo: add if else for network data fetch
-        sectionsAdapter = new SectionsAdapter(requireContext(), sectionsViewModel, this);
+        SectionsAdapter sectionsAdapter = new SectionsAdapter(requireContext(), sectionsViewModel, this);
+        sectionsViewModel.getSections().setValue(null);
+        //todo: add progressbar and empty list before every course selection
         Course course = coursesViewModel.getMyCourses().getValue().get(Constants.current_course_id);
         binding.txtCourseTitleDetail.setText(course.getTitle());
         binding.courseDetailCompletedLectures.setText(course.getTotal_number_of_completed_lessons()+"/"+course.getTotal_number_of_lessons());
@@ -125,14 +129,32 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         binding.courseDetailProgressBar.setProgress(calculateProgress(course));
         binding.recyclerViewCourseDetail.setAdapter(sectionsAdapter);
         gson = new Gson();
-        PRDownloader.initialize(getActivity().getApplicationContext());
+
         // Populate course list (You may fetch it from database or API)
         if(checkInternet()!=0) {
-            callAPIForCoursesSections();
+            if(sectionsViewModel.getSections().getValue().isEmpty()) {
+                binding.progressBarCourseDetail.setVisibility(View.VISIBLE);
+                callAPIForCoursesSections();
+            }
         }
         else{
             Toast.makeText(getContext(), "No internet connection", Toast.LENGTH_SHORT).show();
         }
+
+        binding.swipeRefreshLayoutCourseDetail.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if(checkInternet()!=0) {
+                    if(sectionsViewModel.getSections().getValue().isEmpty()) {
+                        binding.progressBarCourseDetail.setVisibility(View.VISIBLE);
+                        callAPIForCoursesSections();
+                    }
+                }
+                else{
+                    Toast.makeText(getContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         dbHelper = new DatabaseHelper(getContext());
         onDownloadComplete = new BroadcastReceiver() {
@@ -159,9 +181,13 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 
                     }
                     Toast.makeText(getContext(), "Download Completed", Toast.LENGTH_SHORT).show();
+                    updateLessonOnServer();
                 }
+                lesson_id = -1;
                 downloadID = -1;
             }
+
+
         };
         getActivity().registerReceiver(onDownloadComplete,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
@@ -169,83 +195,16 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         return root;
     }
 
+    private void updateLessonOnServer() {
+        //todo: complete this
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
     }
-//    private void beginDownload(String url){
-//
-//        String folderName = "DownloadedVideos";
-//        file = null;
-//// Get the path to the directory in the app's internal storage
-//        File directory = new File(getActivity().getFilesDir(), folderName);
-//        String name = url.substring(url.lastIndexOf("/"));
-//        file = new File(directory, name);
-//        if (!directory.exists()) {
-//            directory.mkdirs();
-//        }
-////
-//        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url))
-//                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)// Visibility of the download Notification
-////                .setDestinationUri(Uri.fromFile(file.getAbsoluteFile()))// Uri of the destination file
-//                .setTitle(name)// Title of the Download Notification
-//                .setDescription("Downloading")// Description of the Download Notification
-//                .setAllowedOverMetered(true)// Set if download is allowed on Mobile network
-//                .setDestinationInExternalFilesDir(getContext(), null , name)
-//                .setAllowedOverRoaming(true);// Set if download is allowed on roaming network
-//
-//        DownloadManager downloadManager= (DownloadManager) getActivity().getSystemService(DOWNLOAD_SERVICE);
-//        downloadID = downloadManager.enqueue(request);// enqueue puts the download request in the queue.
-//
-//        // using query method
-//        boolean finishDownload = false;
-//        int progress;
-//        while (!finishDownload) {
-//            Cursor cursor = downloadManager.query(new DownloadManager.Query().setFilterById(downloadID));
-//            if (cursor.moveToFirst()) {
-//                int status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
-//                switch (status) {
-//                    case DownloadManager.STATUS_FAILED: {
-//                        finishDownload = true;
-//                        break;
-//                    }
-//                    case DownloadManager.STATUS_PAUSED:
-//                        break;
-//                    case DownloadManager.STATUS_PENDING:
-//                        break;
-//                    case DownloadManager.STATUS_RUNNING: {
-//                        final long total = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-//                        if (total >= 0) {
-//                            final long downloaded = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-//                            progress = (int) ((downloaded * 100L) / total);
-//                            // if you use downloadmanger in async task, here you can use like this to display progress.
-//                            // Don't forget to do the division in long to get more digits rather than double.
-//                            //  publishProgress((int) ((downloaded * 100L) / total));
-//                        }
-//                        break;
-//                    }
-//                    case DownloadManager.STATUS_SUCCESSFUL: {
-//                        progress = 100;
-//                        // if you use aysnc task
-//                        // publishProgress(100);
-//                        finishDownload = true;
-//                        int filesIndex = file.getAbsolutePath().indexOf("/files/");
-//
-//                        // Extract the substring after "/files/"
-//                        String substringAfterFiles = file.getAbsolutePath().substring(filesIndex + "/files/".length());
-//
-//
-//                        downloadedVideo.setVideo_file_path(substringAfterFiles);
-//                        dbHelper.addDownloadedVideo(downloadedVideo);
-//
-//                        Toast.makeText(getContext(), "Download Completed", Toast.LENGTH_SHORT).show();
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//    }
+
     private int calculateProgress(Course course) {
         double m = (double) course.getTotal_number_of_completed_lessons()/course.getTotal_number_of_lessons() *100;
 
@@ -259,7 +218,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
             public void onSuccess(String response) {
                 // Handle successful response
 
-
+                binding.progressBarCourseDetail.setVisibility(View.GONE);
                 sectionsViewModel.getSections().setValue(parseJsonToCourseList(response));
                 Log.d("API Response", response);
             }
@@ -267,6 +226,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
             @Override
             public void onFailure(VolleyError error) {
                 // Handle failure
+                binding.progressBarCourseDetail.setVisibility(View.GONE);
                 Log.d("API Response", error.toString());
             }
         };
@@ -321,9 +281,9 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
                 downloadedVideo.setCourse_title(getCourseTitle(lesson.getCourse_id()));
                 downloadedVideo.setSection_id(lesson.getSection_id());
                 downloadedVideo.setSection_title(getSectionTitle(lesson.getSection_id()));
+                lesson_id = Integer.parseInt(lesson.getId());
                 beginDownload(lesson.getVideo_url_web());
-//                downloadFilePR(lesson.getVideo_url_web());
-//                new DownloadFileFromURL().execute(lesson.getVideo_url_web());
+
             }
             else{
                 Toast.makeText(getContext(), "No Internet Connection", Toast.LENGTH_SHORT).show();
@@ -331,81 +291,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         }
     }
 
-//    private void downloadFilePR(String videoUrlWeb) {
-//        String folderName = "DownloadedVideos";
-//        file = null;
-//// Get the path to the directory in the app's internal storage
-//        File directory = new File(getActivity().getFilesDir(), folderName);
-//        String name = videoUrlWeb.substring(videoUrlWeb.lastIndexOf("/"));
-//        file = new File(directory, name);
-//        if (!directory.exists()) {
-//            directory.mkdirs();
-//        }
-//                showDialog();
-//                downloadId = PRDownloader.download(videoUrlWeb, file.getAbsolutePath(), name)
-//
-//                        .build()
-//                        .setOnStartOrResumeListener(new OnStartOrResumeListener() {
-//                            @Override
-//                            public void onStartOrResume() {
-//                                pDialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("Pause");
-//                                Toast.makeText(getContext(), "Downloading Started", Toast.LENGTH_SHORT).show();
-//                            }
-//                        })
-//                        .setOnPauseListener(new OnPauseListener() {
-//                            @Override
-//                            public void onPause() {
-//                                pDialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("Resume");
-//                                Toast.makeText(getContext(), "Downloading Paused", Toast.LENGTH_SHORT).show();
-//                            }
-//                        })
-//                        .setOnCancelListener(new OnCancelListener() {
-//                            @Override
-//                            public void onCancel() {
-//                                downloadId = 0;
-//                                Toast.makeText(getContext(), "Downloading Cancelled", Toast.LENGTH_SHORT).show();
-//                                pDialog.dismiss();
-//                            }
-//                        })
-//                        .setOnProgressListener(new OnProgressListener() {
-//                            @Override
-//                            public void onProgress(Progress progress) {
-//                                pDialog.setProgress((int)(progress.currentBytes * 100 / progress.totalBytes));
-//                            }
-//                        })
-//                        .start(new OnDownloadListener() {
-//                            @Override
-//                            public void onDownloadComplete() {
-//                                int filesIndex = file.getAbsolutePath().indexOf("/files/");
-//
-//                                // Extract the substring after "/files/"
-//                                String substringAfterFiles = file.getAbsolutePath().substring(filesIndex + "/files/".length());
-//
-//
-//                                downloadedVideo.setVideo_file_path(substringAfterFiles);
-//                                dbHelper.addDownloadedVideo(downloadedVideo);
-//                                pDialog.dismiss();
-//                                pDialog.dismiss();
-//                                Toast.makeText(getContext(), "Downloading Completed", Toast.LENGTH_SHORT).show();
-//                            }
-//
-//                            @Override
-//                            public void onError(Error error) {
-//                                downloadId = 0;
-//                                Toast.makeText(getContext(), error.getServerErrorMessage(), Toast.LENGTH_SHORT).show();
-//
-//                            }
-//
-//
-//
-//
-//                        });
-////
-////        } else {
-////
-////        }
-//
-//    }
+
 private void beginDownload(String url){
     if (downloadID == -1) {
 
@@ -426,44 +312,7 @@ private void beginDownload(String url){
     else{
         Toast.makeText(getContext(), "Already Downloading", Toast.LENGTH_SHORT).show();
     }
-//    // using query method
-//    boolean finishDownload = false;
-//    int progress;
-//    while (!finishDownload) {
-//        Cursor cursor = downloadManager.query(new DownloadManager.Query().setFilterById(downloadID));
-//        if (cursor.moveToFirst()) {
-//            int status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
-//            switch (status) {
-//                case DownloadManager.STATUS_FAILED: {
-//                    finishDownload = true;
-//                    break;
-//                }
-//                case DownloadManager.STATUS_PAUSED:
-//                    break;
-//                case DownloadManager.STATUS_PENDING:
-//                    break;
-//                case DownloadManager.STATUS_RUNNING: {
-//                    final long total = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-//                    if (total >= 0) {
-//                        final long downloaded = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-//                        progress = (int) ((downloaded * 100L) / total);
-//                        // if you use downloadmanger in async task, here you can use like this to display progress.
-//                        // Don't forget to do the division in long to get more digits rather than double.
-//                        //  publishProgress((int) ((downloaded * 100L) / total));
-//                    }
-//                    break;
-//                }
-//                case DownloadManager.STATUS_SUCCESSFUL: {
-//                    progress = 100;
-//                    // if you use aysnc task
-//                    // publishProgress(100);
-//                    finishDownload = true;
-//                    Toast.makeText(getContext(), "Download Completed", Toast.LENGTH_SHORT).show();
-//                    break;
-//                }
-//            }
-//        }
-//    }
+
     }
     private String getCourseTitle(String courseId) {
 
@@ -731,4 +580,5 @@ private void beginDownload(String url){
 
 
     }
+
 }

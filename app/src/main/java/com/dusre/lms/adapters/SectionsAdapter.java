@@ -12,11 +12,9 @@ import com.dusre.lms.R;
 import com.dusre.lms.Util.Constants;
 import com.dusre.lms.databinding.CourseDetailItemViewBinding;
 import com.dusre.lms.listeners.SetOnClickListener;
-import com.dusre.lms.model.Course;
 import com.dusre.lms.model.Lesson;
 import com.dusre.lms.model.Section;
 import com.dusre.lms.viewmodel.SectionsViewModel;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,15 +56,12 @@ public class SectionsAdapter extends RecyclerView.Adapter<SectionsAdapter.Course
     @Override
     public void onBindViewHolder(@NonNull CourseViewHolder holder, int position) {
         Section section = this.sectionsViewModel.getSections().getValue().get(position);
-
         holder.bind(section);
-
-
         boolean isExpandable = section.isExpandable();
         holder.binding.expandableLayout.setVisibility(isExpandable ? View.VISIBLE : View.GONE);
-
         if (isExpandable){
             holder.binding.arrowImageview.setImageResource(R.drawable.baseline_keyboard_arrow_up_24);
+
         }else{
             holder.binding.arrowImageview.setImageResource(R.drawable.baseline_keyboard_arrow_down_24);
         }
@@ -75,15 +70,31 @@ public class SectionsAdapter extends RecyclerView.Adapter<SectionsAdapter.Course
         holder.binding.childRv.setHasFixedSize(true);
         holder.binding.childRv.setAdapter(adapter);
         holder.binding.arrowImageview.setOnClickListener(v -> {
+            if(section.isExpandable()){
+                section.setIs_expandable(false);
+            }
+            else{
+                section.setIs_expandable(true);
+                changeStateOfItemsInLayout(sectionList.get(holder.getLayoutPosition()),holder.getLayoutPosition());
+                lessons = section.getLessons();
+                Constants.current_section_id = position;
+            }
 
-            section.setIs_expandable(!section.isExpandable());
-            lessons = section.getLessons();
-            Constants.current_section_id = position;
 
-            notifyItemChanged(holder.getAdapterPosition());
+            notifyDataSetChanged();
         });
     }
-
+    private void changeStateOfItemsInLayout(Section section, int position) {
+        for (int i = 0; i < sectionList.size(); i++) {
+            if (i == position) {
+                section.setIs_expandable(true);
+                //Since this is the tapped item, we will skip
+                //the rest of loop for this item and set it expanded
+                continue;
+            }
+            sectionList.get(i).setIs_expandable(false);
+        }
+    }
     @Override
     public int getItemCount() {
         return sectionList.size();

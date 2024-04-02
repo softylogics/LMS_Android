@@ -27,6 +27,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.android.volley.VolleyError;
+import com.dusre.lms.MainActivity;
 import com.dusre.lms.R;
 import com.dusre.lms.Util.APIClient;
 import com.dusre.lms.Util.Constants;
@@ -79,7 +80,7 @@ public class DownloadedSectionsFragment extends Fragment implements SetOnClickLi
 
         downloadedVideoViewModel = new ViewModelProvider(requireActivity()).get(DownloadedVideoViewModel.class);
         // Initialize course list and adapter
-        //todo: add if else for network data fetch
+
         downloadedSectionsAdapter = new DownloadedSectionsAdapter(requireContext(), downloadedVideoViewModel, this);
         DownloadedCourse downloadedVideo = downloadedVideoViewModel.getDownloadedCourses().getValue().get(Constants.current_downloaded_course_id);
         binding.txtDownloadedCourseTitleDetail.setText(downloadedVideo.getCourseTitle());
@@ -180,4 +181,5 @@ public class DownloadedSectionsFragment extends Fragment implements SetOnClickLi
 
 
     }
+
 }

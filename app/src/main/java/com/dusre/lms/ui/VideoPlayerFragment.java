@@ -1,5 +1,6 @@
 package com.dusre.lms.ui;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -17,6 +18,7 @@ import androidx.media3.exoplayer.ExoPlayer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.android.volley.VolleyError;
+import com.dusre.lms.MainActivity;
 import com.dusre.lms.R;
 import com.dusre.lms.Util.APIClient;
 import com.dusre.lms.Util.Constants;
@@ -189,4 +191,5 @@ public class VideoPlayerFragment extends Fragment implements SetOnClickListener 
             player.play();
         }
     }
+
 }

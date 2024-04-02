@@ -19,6 +19,10 @@ public class Lesson{
     public int is_completed;
     public boolean user_validity;
 
+    public boolean is_downloaded;
+
+
+
     public String getId() {
         return id;
     }
@@ -153,5 +157,13 @@ public class Lesson{
 
     public void setUser_validity(boolean user_validity) {
         this.user_validity = user_validity;
+    }
+
+    public boolean isIs_downloaded() {
+        return is_downloaded;
+    }
+
+    public void setIs_downloaded(boolean is_downloaded) {
+        this.is_downloaded = is_downloaded;
     }
 }

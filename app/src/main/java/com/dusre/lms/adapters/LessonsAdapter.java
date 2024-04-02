@@ -89,6 +89,9 @@ public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.CourseVi
         public void bind(Lesson lesson) {
             binding.txtLessonTitle.setText(lesson.getTitle());
             binding.txtNestedLectureLength.setText(lesson.getDuration() + " Min");
+            if(lesson.is_downloaded) {
+                binding.ivDownload.setVisibility(View.GONE);
+            }
 //            if(lesson.getIs_completed()) {
 //                binding.cbCompleted.setChecked(true);
 //            }

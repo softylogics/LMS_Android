@@ -65,13 +65,31 @@
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayoutCourseDetail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+     >
+    <FrameLayout
 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_course_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
          />
+        <ProgressBar
+            android:id="@+id/progressBarCourseDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center"
 
+            />
+    </FrameLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>
