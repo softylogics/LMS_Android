@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/speed_0_25x"
+            android:title="0.25x" />
+        <item
+            android:id="@+id/speed_0_5x"
+            android:title="0.5x" />
+
+
+        <item
+            android:id="@+id/speed_normal"
+            android:title="Normal (1x)" />
+        <item
+            android:id="@+id/speed_1_5x"
+            android:title="1.5x" />
+        <item
+            android:id="@+id/speed_2x"
+            android:title="2x" />
+
+    </group>
+</menu>

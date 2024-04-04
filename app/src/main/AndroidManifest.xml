@@ -23,6 +23,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,7 +35,10 @@
             android:name=".LoginActivity"
             android:exported="false"
             android:label="Login"/>
-
+<activity android:name=".ui.VideoPlayerFragment"
+    android:exported="false"
+    android:label="Video Player"
+    android:configChanges="keyboardHidden|orientation|screenSize"/>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

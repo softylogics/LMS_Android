@@ -1,5 +1,9 @@
 package com.dusre.lms.Util;
 
+import com.dusre.lms.model.Lesson;
+
+import java.util.List;
+
 public class Constants {
 
     public static final String LOGGED_IN = "loggesIn";
@@ -13,4 +17,5 @@ public class Constants {
     public static int current_downloaded_lesson_id = 0;
     public static int current_downloaded_section_id = 0;
     public static boolean isDownloadVideoPlay = false;
+    public static List<Lesson> lessons = null;
 }

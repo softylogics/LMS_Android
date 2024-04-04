@@ -118,10 +118,10 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         sectionsViewModel = new ViewModelProvider(requireActivity()).get(SectionsViewModel.class);
         lessonsViewModel = new ViewModelProvider(requireActivity()).get(LessonsViewModel.class);
         // Initialize course list and adapter
-        //todo: add if else for network data fetch
+
         SectionsAdapter sectionsAdapter = new SectionsAdapter(requireContext(), sectionsViewModel, this);
         sectionsViewModel.getSections().setValue(null);
-        //todo: add progressbar and empty list before every course selection
+
         Course course = coursesViewModel.getMyCourses().getValue().get(Constants.current_course_id);
         binding.txtCourseTitleDetail.setText(course.getTitle());
         binding.courseDetailCompletedLectures.setText(course.getTotal_number_of_completed_lessons()+"/"+course.getTotal_number_of_lessons());
@@ -132,7 +132,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 
         // Populate course list (You may fetch it from database or API)
         if(checkInternet()!=0) {
-            if(sectionsViewModel.getSections().getValue().isEmpty()) {
+            if(sectionsViewModel.getSections().getValue()==null) {
                 binding.progressBarCourseDetail.setVisibility(View.VISIBLE);
                 callAPIForCoursesSections();
             }
@@ -145,9 +145,13 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
             @Override
             public void onRefresh() {
                 if(checkInternet()!=0) {
-                    if(sectionsViewModel.getSections().getValue().isEmpty()) {
+                    if(sectionsViewModel.getSections().getValue()==null) {
                         binding.progressBarCourseDetail.setVisibility(View.VISIBLE);
                         callAPIForCoursesSections();
+                        binding.swipeRefreshLayoutCourseDetail.setRefreshing(false);
+                    }
+                    else{
+                        binding.swipeRefreshLayoutCourseDetail.setRefreshing(false);
                     }
                 }
                 else{
@@ -266,7 +270,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 
     @Override
     public void onDownloadButtonClick(int position) {
-        //todo: complete download functionality
+
         lessonsViewModel.setMyLessons(sectionsViewModel.getSections().getValue().get(Constants.current_section_id).getLessons());
         if(hasPermissionToDownload(getActivity())){
             if(checkInternet()!=0) {
@@ -335,12 +339,13 @@ private void beginDownload(String url){
 
     @Override
     public void onLessonNameClick(int position) {
-        //todo: complete this
+
         Constants.isDownloadVideoPlay = false;
         Constants.current_lesson_id = position;
         lessonsViewModel.setMyLessons(sectionsViewModel.getSections().getValue().get(Constants.current_section_id).getLessons());
-
-        navController.navigate(R.id.action_navigation_sections_to_navigation_video_player);
+        Constants.lessons = sectionsViewModel.getSections().getValue().get(Constants.current_section_id).getLessons();
+        startActivity(new Intent(getActivity(), VideoPlayerFragment.class));
+//        navController.navigate(R.id.action_navigation_sections_to_navigation_video_player);
 
     }
 

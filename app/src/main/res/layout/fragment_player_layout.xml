@@ -1,46 +1,188 @@
-<!-- fragment_youtube_player.xml -->
+<?xml version="1.0" encoding="utf-8"?>
+
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-<!--    <androidx.media3.ui.PlayerView-->
-<!--        android:id="@+id/player_view"-->
-<!--        android:background="@color/player_background"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        app:artwork_display_mode="fill"-->
-<!--        app:default_artwork="@drawable/artwork_placeholder"-->
-<!--        app:repeat_toggle_modes="one|all"-->
-<!--        app:show_shuffle_button="true"-->
-<!--        app:shutter_background_color="@color/player_background" />-->
-    <androidx.media3.ui.PlayerView
-        android:id="@+id/exoplayer_view"
+    <com.google.android.material.appbar.MaterialToolbar
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:title="Your Toolbar Title"
+
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+    <LinearLayout
+        android:id="@+id/top_controller"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#000000"
-        app:controller_layout_id="@layout/custom_playback_view"
-
-        app:show_buffering="when_playing"
-        app:buffered_color="@color/unselected_icon_color"
-        app:hide_on_touch="false"
-        app:player_layout_id="@layout/exo_layout_view"
-        app:resize_mode="fit"
-
-        app:show_timeout="4000"
-        app:shutter_background_color="#000000"
-        app:surface_type="surface_view"
-        app:use_controller="true" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:paddingHorizontal="8dp"
+        android:background="#42000000"
+        android:orientation="horizontal">
 
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewNextVideos"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        <TextView
+            android:id="@+id/video_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:text="Video title"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:layout_gravity="center"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:ellipsize="marquee" />
+        <ImageButton
+            android:id="@+id/play_pause_btn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:backgroundTint="@android:color/transparent"
+            android:contentDescription="@string/exo_controls_play_description"
+            android:src="@drawable/ic_play"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="@+id/player_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/white"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground" />
+        <ImageButton
+            android:id="@+id/speed_btn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="centerCrop"
+            android:backgroundTint="@android:color/transparent"
+            android:contentDescription="@string/exo_controls_speed_description"
+            android:src="@drawable/playback_speed"
+            app:tint="@color/white" />
 
-        android:paddingTop="16dp"
-        android:clipToPadding="false"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        android:background="@color/appbackground"
-        android:paddingBottom="16dp" />
-</LinearLayout>
+        <ImageButton
+            android:id="@+id/repeat_btn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="centerCrop"
+            android:backgroundTint="@android:color/transparent"
+            android:contentDescription="@string/exo_controls_repeat_off_description"
+            android:src="@drawable/exo_styled_controls_repeat_off"
+            app:tint="@color/white" />
+
+
+
+
+        <ImageButton
+            android:id="@+id/fullscreen_btn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:backgroundTint="@android:color/transparent"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/exo_controls_fullscreen_enter_description"
+            android:src="@drawable/exo_styled_controls_fullscreen_enter"
+            app:tint="@color/white" />
+<!--        <ImageButton-->
+<!--            android:id="@+id/menu_btn"-->
+<!--            android:layout_width="48dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:src="@drawable/ic_menu"-->
+<!--            android:contentDescription="@string/player_menu"-->
+<!--            app:tint="@color/white"-->
+
+<!--            android:backgroundTint="@android:color/transparent" />-->
+    </LinearLayout>
+        <androidx.media3.ui.PlayerView
+            android:id="@+id/player_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:keepScreenOn="true"
+            app:controller_layout_id="@layout/custom_playback_view"
+            app:use_controller="true"
+            />
+
+
+
+<!--        <ImageButton-->
+<!--            android:id="@+id/lock_btn"-->
+<!--            android:layout_width="48dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:layout_marginEnd="8dp"-->
+<!--            android:backgroundTint="@android:color/transparent"-->
+<!--            android:contentDescription="@string/lock"-->
+<!--            android:src="@drawable/ic_lock"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:tint="@color/white" />-->
+
+
+
+<!--        <LinearLayout-->
+<!--            android:id="@+id/bottom_controller"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="#42000000"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:paddingHorizontal="8dp"-->
+<!--            android:gravity="bottom|end"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent">-->
+<!--            <ImageButton-->
+<!--                android:id="@+id/play_pause_btn"-->
+<!--                android:layout_width="48dp"-->
+<!--                android:layout_height="48dp"-->
+<!--                android:backgroundTint="@android:color/transparent"-->
+<!--                android:contentDescription="@string/exo_controls_play_description"-->
+<!--                android:src="@drawable/ic_play"-->
+<!--                android:scaleType="centerCrop"-->
+<!--                app:layout_constraintBottom_toBottomOf="@+id/player_view"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent"-->
+<!--                app:tint="@color/white"-->
+<!--                android:clickable="true"-->
+<!--                android:focusable="true"-->
+<!--                android:background="?attr/selectableItemBackground" />-->
+<!--            <ImageButton-->
+<!--                android:id="@+id/speed_btn"-->
+<!--                android:layout_width="48dp"-->
+<!--                android:layout_height="48dp"-->
+<!--                android:scaleType="centerCrop"-->
+<!--                android:backgroundTint="@android:color/transparent"-->
+<!--                android:contentDescription="@string/exo_controls_speed_description"-->
+<!--                android:src="@drawable/playback_speed"-->
+<!--                app:tint="@color/white" />-->
+
+<!--            <ImageButton-->
+<!--                android:id="@+id/repeat_btn"-->
+<!--                android:layout_width="48dp"-->
+<!--                android:layout_height="48dp"-->
+<!--                android:scaleType="centerCrop"-->
+<!--                android:backgroundTint="@android:color/transparent"-->
+<!--                android:contentDescription="@string/exo_controls_repeat_off_description"-->
+<!--                android:src="@drawable/exo_styled_controls_repeat_off"-->
+<!--                app:tint="@color/white" />-->
+
+
+
+
+<!--            <ImageButton-->
+<!--                android:id="@+id/fullscreen_btn"-->
+<!--                android:layout_width="48dp"-->
+<!--                android:layout_height="48dp"-->
+<!--                android:backgroundTint="@android:color/transparent"-->
+<!--                android:scaleType="centerCrop"-->
+<!--                android:contentDescription="@string/exo_controls_fullscreen_enter_description"-->
+<!--                android:src="@drawable/exo_styled_controls_fullscreen_enter"-->
+<!--                app:tint="@color/white" />-->
+<!--        </LinearLayout>-->
+
+    </LinearLayout>

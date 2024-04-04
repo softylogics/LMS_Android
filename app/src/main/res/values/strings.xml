@@ -20,4 +20,9 @@
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
+    <string name="player_time_separator">:</string>
+    <string name="back_btn">Back Button</string>
+    <string name="player_menu">Player Menu</string>
+    <string name="lock">Lock icon</string>
+    <string name="exo_controls_speed_description">Playback Speed</string>
 </resources>

@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
         }else {
             binding = ActivityMainBinding.inflate(getLayoutInflater());
             setContentView(binding.getRoot());
+            setSupportActionBar(binding.toolbar);
+            binding.toolbar.setLogo(R.drawable.login_frag_icon);
             coursesViewModel = new ViewModelProvider(this).get(CoursesViewModel.class);
             sectionsViewModel = new ViewModelProvider(this).get(SectionsViewModel.class);
             lessonsViewModel = new ViewModelProvider(this).get(LessonsViewModel.class);

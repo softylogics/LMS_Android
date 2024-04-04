@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
@@ -116,7 +117,7 @@ public class DownloadedSectionsFragment extends Fragment implements SetOnClickLi
 
     @Override
     public void onCheckBoxClick(int position) {
-        //todo: complete this checkbox functionality
+
     }
 
     @Override
@@ -142,12 +143,13 @@ public class DownloadedSectionsFragment extends Fragment implements SetOnClickLi
 
     @Override
     public void onDownloadedLessonNameClick(int position) {
-        //todo: complete this
+
         Constants.isDownloadVideoPlay = true;
         Constants.current_downloaded_lesson_id = position;
 
+        startActivity(new Intent(getActivity(), VideoPlayerFragment.class));
 
-        navController.navigate(R.id.action_navigation_downloaded_sections_to_navigation_video_player);
+//        navController.navigate(R.id.action_navigation_downloaded_sections_to_navigation_video_player);
 
     }
 

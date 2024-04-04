@@ -66,7 +66,7 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
         navController = Navigation.findNavController(view);
         coursesViewModel = new ViewModelProvider(requireActivity()).get(CoursesViewModel.class);
         // Initialize course list and adapter
-        courseList = new ArrayList<>(); //todo: add if else for network data fetch
+        courseList = new ArrayList<>();
         MyCoursesAdapter courseAdapter = new MyCoursesAdapter(requireContext(), courseList, coursesViewModel, this);
 
         binding.recyclerViewMyCourses.setAdapter(courseAdapter);
@@ -85,11 +85,17 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
             @Override
             public void onRefresh() {
                 if(courseList.isEmpty()) {
+                    Log.d("refresh" , "in refresh");
                     binding.progressBar.setVisibility(View.VISIBLE);
                     callAPIForCourses();
+                    binding.swipeRefreshLayout.setRefreshing(false);
+                }
+                else{
+                    binding.swipeRefreshLayout.setRefreshing(false);
                 }
             }
         });
+
     }
     private int checkInternet() {
         int result = 0; // Returns connection type. 0: none; 1: mobile data; 2: wifi

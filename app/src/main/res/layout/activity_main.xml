@@ -5,7 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+    <com.google.android.material.appbar.MaterialToolbar
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:title="Your Toolbar Title"
 
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
     <fragment
         android:layout_weight="9"
         android:id="@+id/nav_host_fragment_activity_main"
