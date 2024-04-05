@@ -15,7 +15,7 @@
         android:orientation="vertical"
         android:id="@+id/linear_layout"
         android:padding="20dp"
-        android:background="@drawable/rounded_bg_item_account">
+        android:background="@drawable/rounded_bg_course_item">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -38,7 +38,7 @@
                     android:maxLines="2"
                     android:ellipsize="end"
                     android:text="Communication with client and marketing proposals"
-                    android:textColor="#000000"
+                    android:textColor="@color/dark_gray"
                     android:textSize="15sp"
                     />
 
@@ -47,7 +47,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
-                    <com.google.android.material.button.MaterialButton
+                    <Button
                         android:id="@+id/btnLessonTiming"
                         android:layout_width="wrap_content"
                         android:layout_height="35dp"
@@ -56,8 +56,8 @@
 
                         android:fontFamily="@font/roboto_light"
                         android:textColor="#FFFFFF"
-                        android:layout_marginRight="10dp"
-                        android:backgroundTint="@color/primary"
+
+                        android:backgroundTint="@color/link_color"
 
 
                         />
@@ -71,7 +71,7 @@
                         android:textSize="8sp"
                         android:textColor="#FFFFFF"
                         android:fontFamily="@font/roboto_light"
-                        android:backgroundTint="@color/primary"
+                        android:backgroundTint="@color/link_color"
                         />
 
 

@@ -90,7 +90,7 @@
         android:backgroundTint="@color/primary"
         android:text="Login"
         android:layout_gravity="center_horizontal"
-        android:textColor="@color/buttontext" />
+        android:textColor="@color/textColor" />
 
 
 

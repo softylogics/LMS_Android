@@ -49,7 +49,7 @@ public class SectionsAdapter extends RecyclerView.Adapter<SectionsAdapter.Course
     @NonNull
     @Override
     public CourseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        CourseDetailItemViewBinding binding = CourseDetailItemViewBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        CourseDetailItemViewBinding binding = CourseDetailItemViewBinding.inflate(LayoutInflater.from(context), parent, false);
         return new CourseViewHolder(binding);
     }
 

@@ -17,7 +17,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.LMS"
+        android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
         tools:targetApi="31">
 
         <activity
@@ -34,6 +34,7 @@
         <activity
             android:name=".LoginActivity"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:label="Login"/>
 <activity android:name=".ui.VideoPlayerFragment"
     android:exported="false"

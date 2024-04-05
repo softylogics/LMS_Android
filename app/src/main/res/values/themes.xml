@@ -1,16 +1,25 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.LMS" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+<resources>
+
+    <!-- Application Themes -->
+    <style name="BaseAppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/myPrimaryDarkColor</item>
+        <item name="colorAccent">@color/myAccentColor</item>
+        <item name="android:textColorPrimary">@color/textColor</item>
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:windowBackground">@color/myWindowBackground</item>
+
+        <item name="toolbarForeground">@color/white</item>
+        <item name="toolbarBackground">@color/primary</item>
     </style>
+
+
+    <!-- Toolbar Styles -->
+    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="spinBars">true</item>
+        <item name="color">?toolbarForeground</item><!-- Changed -->
+    </style>
+
 </resources>

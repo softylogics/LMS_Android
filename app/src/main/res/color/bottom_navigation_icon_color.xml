@@ -1,5 +1,5 @@
 <!-- bottom_navigation_icon_color.xml -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/primary" android:state_checked="true" />
-    <item android:color="@color/unselected_icon_color" />
+    <item android:color="@color/black_more_translucent" android:state_checked="true" />
+    <item android:color="@color/black_almost_translucent" />
 </selector>

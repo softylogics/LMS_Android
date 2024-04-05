@@ -38,7 +38,7 @@
                     android:maxLines="2"
                     android:ellipsize="end"
                     android:text="Communication with client and marketing proposals"
-                    android:textColor="#000000"
+                    android:textColor="@color/dark_gray"
                     android:textSize="15sp"/>
 
 

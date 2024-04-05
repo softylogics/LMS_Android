@@ -67,7 +67,7 @@ import java.util.Map;
 public class VideoPlayerFragment extends AppCompatActivity implements SetOnClickListener {
 
     private FragmentPlayerLayoutBinding binding;
-    //todo: set players gui
+
 
     private List<Lesson> lessonList;
     private CoursesViewModel coursesViewModel;

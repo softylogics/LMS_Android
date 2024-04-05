@@ -7,7 +7,8 @@
     android:orientation="vertical"
     android:gravity="center"
     tools:context=".ui.AccountFragment"
-    android:background="#B0F6F2F2">
+    android:background="?attr/colorPrimary"
+   >
 
    <com.google.android.material.imageview.ShapeableImageView
        android:id="@+id/imvCircular"
@@ -72,7 +73,7 @@
              android:scaleType="fitXY"
              android:paddingHorizontal="10dp"
              app:tint="@color/primary"
-
+             android:backgroundTint="#F8F5F5"
              android:background="@drawable/rounded_bg_item_account"
              />
       </LinearLayout>
@@ -140,6 +141,7 @@
        android:layout_height="32dp"
        android:src="@drawable/baseline_logout_24"
        android:padding="5dp"
+       app:tint="@color/primary"
        />
 
 

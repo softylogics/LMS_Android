@@ -4,17 +4,45 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="?attr/colorPrimary">
     <com.google.android.material.appbar.MaterialToolbar
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:title="Your Toolbar Title"
+        android:background="@color/myWindowBackground"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
 
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        <!-- Logo and Title Container -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <!-- Logo -->
+            <ImageView
+                android:id="@+id/toolbarLogo"
+                android:layout_gravity="center"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/app_logo"
+
+                android:scaleType="fitCenter"
+                 />
+
+            <!-- Title -->
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Sidra Naseem Skills Hub"
+                android:textColor="@color/textColor"
+                android:gravity="center"
+                android:fontFamily="@font/roboto_medium"
+                android:layout_marginStart="20dp"
+                android:textSize="18sp" />
+        </LinearLayout>
+    </com.google.android.material.appbar.MaterialToolbar>
     <fragment
         android:layout_weight="9"
         android:id="@+id/nav_host_fragment_activity_main"
