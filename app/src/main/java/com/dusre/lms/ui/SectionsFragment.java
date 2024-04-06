@@ -3,6 +3,7 @@ package com.dusre.lms.ui;
 import static android.content.Context.DOWNLOAD_SERVICE;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
@@ -82,28 +83,29 @@ import java.util.UUID;
 public class SectionsFragment extends Fragment implements SetOnClickListener {
 
     private CourseDetailLayoutBinding binding;
-    private List<Course> courseList;
+//    private List<Course> courseList;
     private CoursesViewModel coursesViewModel;
     private SectionsViewModel sectionsViewModel;
 
     private LessonsViewModel lessonsViewModel;
     private Gson gson;
-    private NavController navController;
-    private ProgressDialog pDialog;
+//    private NavController navController;
+//    private ProgressDialog pDialog;
 
     private DownloadedVideo downloadedVideo;
     private DatabaseHelper dbHelper;
-    private String videoId = "";
     private DownloadManager downloadManager;
     private long downloadID = -1;
 
 
-    private File file;
+//    private File file;
     private BroadcastReceiver onDownloadComplete;
     private int lesson_id = -1;
+    private BroadcastReceiver onDownloadNotoficationClicked;
 
     public SectionsFragment() {
     }
+
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -124,7 +126,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 
         Course course = coursesViewModel.getMyCourses().getValue().get(Constants.current_course_id);
         binding.txtCourseTitleDetail.setText(course.getTitle());
-        binding.courseDetailCompletedLectures.setText(course.getTotal_number_of_completed_lessons()+"/"+course.getTotal_number_of_lessons());
+        binding.courseDetailCompletedLectures.setText(course.getTotal_number_of_completed_lessons() + "/" + course.getTotal_number_of_lessons());
         binding.courseDetailProgressBarLabel.setText(course.getCompletion()+"% Complete");
         binding.courseDetailProgressBar.setProgress(calculateProgress(course));
         binding.recyclerViewCourseDetail.setAdapter(sectionsAdapter);
@@ -185,7 +187,8 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 
                     }
                     Toast.makeText(getContext(), "Download Completed", Toast.LENGTH_SHORT).show();
-                    updateLessonOnServer();
+                    binding.progressBarCourseDetail.setVisibility(View.VISIBLE);
+//                    updateLessonOnServer();
                 }
                 lesson_id = -1;
                 downloadID = -1;
@@ -193,20 +196,59 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 
 
         };
-        getActivity().registerReceiver(onDownloadComplete,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        requireActivity().registerReceiver(onDownloadComplete,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
+        onDownloadNotoficationClicked = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+                if (downloadID != id) {
+
+                        Toast.makeText(context, "Download Notification Clicked", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        };
+        requireActivity().registerReceiver(onDownloadNotoficationClicked,new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));
 
 
         return root;
     }
 
     private void updateLessonOnServer() {
-        //todo: complete this
+        APIClient myVolleyApiClient = new APIClient(getContext());
+
+        APIClient.ApiResponseListener listener = new APIClient.ApiResponseListener() {
+            @Override
+            public void onSuccess(String response) {
+                // Handle successful response
+
+                binding.progressBarCourseDetail.setVisibility(View.GONE);
+                sectionsViewModel.getSections().setValue(parseJsonToCourseList(response));
+                Log.d("API Response", response);
+            }
+
+            @Override
+            public void onFailure(VolleyError error) {
+                // Handle failure
+                binding.progressBarCourseDetail.setVisibility(View.GONE);
+                Log.d("API Response", error.toString());
+            }
+        };
+
+
+        Map<String, String> params = new HashMap<>();
+        params.put("auth_token", UserPreferences.getString(Constants.TOKEN));
+        params.put("course_id", String.valueOf(coursesViewModel.getMyCourses().getValue().get(Constants.current_course_id).id));
+
+        myVolleyApiClient.fetchDataFromApi(Constants.url+"sections", params, listener);
+
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        navController = Navigation.findNavController(view);
+//        navController = Navigation.findNavController(view);
     }
 
     private int calculateProgress(Course course) {
@@ -242,6 +284,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 
         myVolleyApiClient.fetchDataFromApi(Constants.url+"sections", params, listener);
     }
+
     public List<Section> parseJsonToCourseList(String jsonString) {
         Type listType = new TypeToken<List<Section>>(){}.getType();
         return gson.fromJson(jsonString, listType);
@@ -274,7 +317,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         lessonsViewModel.setMyLessons(sectionsViewModel.getSections().getValue().get(Constants.current_section_id).getLessons());
         if(hasPermissionToDownload(getActivity())){
             if(checkInternet()!=0) {
-                videoId = UUID.randomUUID().toString();
+                String videoId = UUID.randomUUID().toString();
 
                 Lesson lesson = lessonsViewModel.getMyLessons().getValue().get(position);
                 downloadedVideo = new DownloadedVideo();
@@ -285,6 +328,8 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
                 downloadedVideo.setCourse_title(getCourseTitle(lesson.getCourse_id()));
                 downloadedVideo.setSection_id(lesson.getSection_id());
                 downloadedVideo.setSection_title(getSectionTitle(lesson.getSection_id()));
+                downloadedVideo.setUpdateOnServer(false);
+                //todo: start from here
                 lesson_id = Integer.parseInt(lesson.getId());
                 beginDownload(lesson.getVideo_url_web());
 
@@ -375,9 +420,7 @@ private void beginDownload(String url){
     }
 
     public static boolean hasPermissionToDownload(final Activity context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Build.VERSION.SDK_INT >= 29 ||
-                ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        == PackageManager.PERMISSION_GRANTED )
+        if (Build.VERSION.SDK_INT >= 29 || ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
             return true;
 
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
@@ -386,8 +429,7 @@ private void beginDownload(String url){
             public void onClick(DialogInterface dialog, int id) {
                 // Fire off an async request to actually get the permission
                 // This will show the standard permission request dialog UI
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                    context.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+                context.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
             }
         });
         androidx.appcompat.app.AlertDialog dialog = builder.create();
@@ -395,176 +437,176 @@ private void beginDownload(String url){
 
         return false;
     }
-    public void showDialog() {
-        pDialog = new ProgressDialog(getActivity());
-        pDialog.setMessage("Downloading file. Please wait...");
-        pDialog.setIndeterminate(false);
-        pDialog.setMax(100);
-        pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        pDialog.setCancelable(false);
-        pDialog.show();
-
-
-
-    }
-    class DownloadFileFromURL extends AsyncTask<String, String, String> {
-
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            showDialog();
-        }
-
-
-        @Override
-        protected String doInBackground(String... f_url) {
-            int count;
-            File file = null;
-            try {
-                URL url = new URL(f_url[0]);
-
-                String decodedURL = java.net.URLDecoder.decode(f_url[0], "UTF-8");
-                Log.d("url", decodedURL);
-                String name = decodedURL.substring(f_url[0].lastIndexOf("/"));
-                URLConnection connection = url.openConnection();
-                connection.connect();
-                // getting file length
-                int lenghtOfFile = connection.getContentLength();
-
-                // input stream to read file - with 8k buffer
-                InputStream input = new BufferedInputStream(url.openStream(), 8192);
-
-                // Specify the folder name where you want to save files
-                String folderName = "DownloadedVideos";
-
-// Get the path to the directory in the app's internal storage
-                File directory = new File(getActivity().getFilesDir(), folderName);
-
-// Check if the directory already exists, if not, create it
-                if (!directory.exists()) {
-                    if (directory.mkdirs()) {
-                        // Directory created successfully or already exists
-                        // Now you can save files into this directory
-                        // Create a new file in the specified directory
-                            file = new File(directory, name);
-
-                        // Output stream to write file
-                        OutputStream output = new FileOutputStream(file);
-
-                        byte data[] = new byte[1024];
-
-                        long total = 0;
-
-                        while ((count = input.read(data)) != -1) {
-                            total += count;
-                            // publishing the progress....
-                            // After this onProgressUpdate will be called
-                            publishProgress(""+(int)((total*100)/lenghtOfFile));
-
-                            // writing data to file
-                            output.write(data, 0, count);
-                        }
-
-                        // flushing output
-                        output.flush();
-
-                        // closing streams
-                        output.close();
-                        input.close();
-                    } else {
-                        // Failed to create directory
-                        // Handle this case according to your app's logic
-                    }
-                } else {
-                    // Directory already exists
-                    // You can proceed to save files into this directory
-                    // Create a new file in the specified directory
-                    file = new File(directory, name);
-
-                    // Output stream to write file
-                    OutputStream output = new FileOutputStream(file);
-
-                    byte data[] = new byte[1024];
-
-                    long total = 0;
-
-                    while ((count = input.read(data)) != -1) {
-                        total += count;
-                        // publishing the progress....
-                        // After this onProgressUpdate will be called
-                        publishProgress(""+(int)((total*100)/lenghtOfFile));
-
-                        // writing data to file
-                        output.write(data, 0, count);
-                    }
-
-                    // flushing output
-                    output.flush();
-
-                    // closing streams
-                    output.close();
-                    input.close();
-                }
-
-
-
-            } catch (Exception e) {
-                Log.e("Error: ", e.getMessage());
-            }
-            if(file!=null) {
-                return file.getAbsolutePath();
-            }
-            else{
-                return null;
-            }
-        }
-
-        /**
-         * Updating progress bar
-         * */
-        protected void onProgressUpdate(String... progress) {
-            // setting progress percentage
-            pDialog.setProgress(Integer.parseInt(progress[0]));
-        }
-
-        /**
-         * After completing background task
-         * Dismiss the progress dialog
-         * **/
-        @Override
-        protected void onPostExecute(String file_url) {
-            // dismiss the dialog after the file was downloaded
-
-
-            // Find the index of "/files/"
-            int filesIndex = file_url.indexOf("/files/");
-
-                // Extract the substring after "/files/"
-                String substringAfterFiles = file_url.substring(filesIndex + "/files/".length());
-
-
-            downloadedVideo.setVideo_file_path(substringAfterFiles);
-            dbHelper.addDownloadedVideo(downloadedVideo);
-            pDialog.dismiss();
-
-        }
-        @Override
-        protected void onCancelled(String file_url) {
-            // If the download was cancelled, you can clean up resources here
-            // Delete the partially downloaded file if it exists
-            if (file_url != null) {
-                File file = new File(file_url);
-                if (file.exists()) {
-                    file.delete();
-                }
-            }
-            dbHelper.deleteDownloadedVideo(videoId);
-            // Dismiss the progress dialog
-            pDialog.dismiss();
-        }
-
-    }
+//    public void showDialog() {
+//        pDialog = new ProgressDialog(getActivity());
+//        pDialog.setMessage("Downloading file. Please wait...");
+//        pDialog.setIndeterminate(false);
+//        pDialog.setMax(100);
+//        pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+//        pDialog.setCancelable(false);
+//        pDialog.show();
+//
+//
+//
+//    }
+//    class DownloadFileFromURL extends AsyncTask<String, String, String> {
+//
+//
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//            showDialog();
+//        }
+//
+//
+//        @Override
+//        protected String doInBackground(String... f_url) {
+//            int count;
+//            File file = null;
+//            try {
+//                URL url = new URL(f_url[0]);
+//
+//                String decodedURL = java.net.URLDecoder.decode(f_url[0], "UTF-8");
+//                Log.d("url", decodedURL);
+//                String name = decodedURL.substring(f_url[0].lastIndexOf("/"));
+//                URLConnection connection = url.openConnection();
+//                connection.connect();
+//                // getting file length
+//                int lenghtOfFile = connection.getContentLength();
+//
+//                // input stream to read file - with 8k buffer
+//                InputStream input = new BufferedInputStream(url.openStream(), 8192);
+//
+//                // Specify the folder name where you want to save files
+//                String folderName = "DownloadedVideos";
+//
+//// Get the path to the directory in the app's internal storage
+//                File directory = new File(getActivity().getFilesDir(), folderName);
+//
+//// Check if the directory already exists, if not, create it
+//                if (!directory.exists()) {
+//                    if (directory.mkdirs()) {
+//                        // Directory created successfully or already exists
+//                        // Now you can save files into this directory
+//                        // Create a new file in the specified directory
+//                            file = new File(directory, name);
+//
+//                        // Output stream to write file
+//                        OutputStream output = new FileOutputStream(file);
+//
+//                        byte data[] = new byte[1024];
+//
+//                        long total = 0;
+//
+//                        while ((count = input.read(data)) != -1) {
+//                            total += count;
+//                            // publishing the progress....
+//                            // After this onProgressUpdate will be called
+//                            publishProgress(""+(int)((total*100)/lenghtOfFile));
+//
+//                            // writing data to file
+//                            output.write(data, 0, count);
+//                        }
+//
+//                        // flushing output
+//                        output.flush();
+//
+//                        // closing streams
+//                        output.close();
+//                        input.close();
+//                    } else {
+//                        // Failed to create directory
+//                        // Handle this case according to your app's logic
+//                    }
+//                } else {
+//                    // Directory already exists
+//                    // You can proceed to save files into this directory
+//                    // Create a new file in the specified directory
+//                    file = new File(directory, name);
+//
+//                    // Output stream to write file
+//                    OutputStream output = new FileOutputStream(file);
+//
+//                    byte data[] = new byte[1024];
+//
+//                    long total = 0;
+//
+//                    while ((count = input.read(data)) != -1) {
+//                        total += count;
+//                        // publishing the progress....
+//                        // After this onProgressUpdate will be called
+//                        publishProgress(""+(int)((total*100)/lenghtOfFile));
+//
+//                        // writing data to file
+//                        output.write(data, 0, count);
+//                    }
+//
+//                    // flushing output
+//                    output.flush();
+//
+//                    // closing streams
+//                    output.close();
+//                    input.close();
+//                }
+//
+//
+//
+//            } catch (Exception e) {
+//                Log.e("Error: ", e.getMessage());
+//            }
+//            if(file!=null) {
+//                return file.getAbsolutePath();
+//            }
+//            else{
+//                return null;
+//            }
+//        }
+//
+//        /**
+//         * Updating progress bar
+//         * */
+//        protected void onProgressUpdate(String... progress) {
+//            // setting progress percentage
+//            pDialog.setProgress(Integer.parseInt(progress[0]));
+//        }
+//
+//        /**
+//         * After completing background task
+//         * Dismiss the progress dialog
+//         * **/
+//        @Override
+//        protected void onPostExecute(String file_url) {
+//            // dismiss the dialog after the file was downloaded
+//
+//
+//            // Find the index of "/files/"
+//            int filesIndex = file_url.indexOf("/files/");
+//
+//                // Extract the substring after "/files/"
+//                String substringAfterFiles = file_url.substring(filesIndex + "/files/".length());
+//
+//
+//            downloadedVideo.setVideo_file_path(substringAfterFiles);
+//            dbHelper.addDownloadedVideo(downloadedVideo);
+//            pDialog.dismiss();
+//
+//        }
+//        @Override
+//        protected void onCancelled(String file_url) {
+//            // If the download was cancelled, you can clean up resources here
+//            // Delete the partially downloaded file if it exists
+//            if (file_url != null) {
+//                File file = new File(file_url);
+//                if (file.exists()) {
+//                    file.delete();
+//                }
+//            }
+//            dbHelper.deleteDownloadedVideo(videoId);
+//            // Dismiss the progress dialog
+//            pDialog.dismiss();
+//        }
+//
+//    }
 
     private int checkInternet() {
         int result = 0; // Returns connection type. 0: none; 1: mobile data; 2: wifi

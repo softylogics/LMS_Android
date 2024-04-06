@@ -65,12 +65,11 @@ public class DownloadedSectionsFragment extends Fragment implements SetOnClickLi
     private DownloadedVideoViewModel downloadedVideoViewModel;
       private Gson gson;
     private NavController navController;
-    private ProgressDialog pDialog;
 
 
     private DatabaseHelper dbHelper;
 
-
+//todo: downloaded lectures not categorized properly
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -146,7 +145,7 @@ public class DownloadedSectionsFragment extends Fragment implements SetOnClickLi
 
         Constants.isDownloadVideoPlay = true;
         Constants.current_downloaded_lesson_id = position;
-
+        Constants.downloadedLessons = downloadedVideoViewModel.getDownloadedCourses().getValue().get(Constants.current_downloaded_course_id).getDownloadedSections().get(Constants.current_downloaded_section_id).getDownloadedLessons();
         startActivity(new Intent(getActivity(), VideoPlayerFragment.class));
 
 //        navController.navigate(R.id.action_navigation_downloaded_sections_to_navigation_video_player);

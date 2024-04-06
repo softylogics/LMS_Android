@@ -76,7 +76,7 @@ public class DownloadedLessonsAdapter extends RecyclerView.Adapter<DownloadedLes
             binding.txtDownloadedNestedLessonTitle.setText(lesson.getLessonTitle());
 
             binding.txtLessonNum.setText((position+1)+"");
-            //todo: add del option code
+
         }
     }
 }

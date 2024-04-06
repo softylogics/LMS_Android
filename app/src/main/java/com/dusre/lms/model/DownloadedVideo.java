@@ -1,5 +1,6 @@
 package com.dusre.lms.model;
 
+//This class is used to store the meta data about the downloaded video in the Sqlite db
 public class DownloadedVideo {
 
     private String id;
@@ -10,6 +11,7 @@ public class DownloadedVideo {
     private String section_id;
     private String section_title;
     private String video_file_path;
+    private boolean isUpdateOnServer;
 
 
     public String getId() {
@@ -75,5 +77,13 @@ public class DownloadedVideo {
 
     public void setVideo_file_path(String videoFilePath) {
         this.video_file_path = videoFilePath;
+    }
+
+    public boolean isUpdateOnServer() {
+        return isUpdateOnServer;
+    }
+
+    public void setUpdateOnServer(boolean updateOnServer) {
+        isUpdateOnServer = updateOnServer;
     }
 }

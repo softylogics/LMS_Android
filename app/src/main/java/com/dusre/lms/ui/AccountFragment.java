@@ -41,8 +41,9 @@ public class AccountFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
-        binding.ivDownloaded.setOnClickListener(v->{
+        binding.downloadCoursesLayout.setOnClickListener(v->{
             navController.navigate(R.id.action_navigation_account_to_navigation_downloaded_videos);
+
         });
         binding.ivLogout.setOnClickListener(v->{
             UserPreferences.setBoolean(Constants.LOGGED_IN, false);

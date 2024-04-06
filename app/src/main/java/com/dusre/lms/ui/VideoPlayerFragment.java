@@ -1,83 +1,52 @@
 package com.dusre.lms.ui;
 
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.PersistableBundle;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
-import android.widget.RelativeLayout;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackParameters;
 import androidx.media3.common.Player;
 import androidx.media3.common.util.UnstableApi;
-import androidx.media3.common.util.Util;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.PlayerControlView;
-import androidx.media3.ui.PlayerView;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.android.volley.VolleyError;
-import com.dusre.lms.MainActivity;
 import com.dusre.lms.R;
-import com.dusre.lms.Util.APIClient;
 import com.dusre.lms.Util.Constants;
 import com.dusre.lms.adapters.NextVideoAdapter;
-import com.dusre.lms.adapters.SectionsAdapter;
-import com.dusre.lms.databinding.CourseDetailLayoutBinding;
 import com.dusre.lms.databinding.FragmentPlayerLayoutBinding;
 import com.dusre.lms.listeners.SetOnClickListener;
-import com.dusre.lms.model.Course;
-
 import com.dusre.lms.model.DownloadedCourse;
 import com.dusre.lms.model.Lesson;
-import com.dusre.lms.model.Section;
+import com.dusre.lms.viewmodel.CoursesViewModel;
 import com.dusre.lms.viewmodel.DownloadedVideoViewModel;
 import com.dusre.lms.viewmodel.LessonsViewModel;
 import com.dusre.lms.viewmodel.SectionsViewModel;
-import com.dusre.lms.viewmodel.CoursesViewModel;
-
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.io.File;
-import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class VideoPlayerFragment extends AppCompatActivity implements SetOnClickListener {
 
     private FragmentPlayerLayoutBinding binding;
 
 
-    private List<Lesson> lessonList;
-    private CoursesViewModel coursesViewModel;
-    private SectionsViewModel sectionsViewModel;
+//    private List<Lesson> lessonList;
     private LessonsViewModel lessonsViewModel;
 
     private DownloadedVideoViewModel downloadedVideoViewModel;
-    private Gson gson;
+
     private ExoPlayer player;
-    private NextVideoAdapter adapter;
+//    private NextVideoAdapter adapter;
     private boolean playWhenReady = true;
     private boolean shouldRepeat = false;
     private boolean isFullscreen = false;
@@ -89,12 +58,12 @@ public class VideoPlayerFragment extends AppCompatActivity implements SetOnClick
         binding = FragmentPlayerLayoutBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
-        coursesViewModel = new ViewModelProvider(this).get(CoursesViewModel.class);
-        sectionsViewModel = new ViewModelProvider(this).get(SectionsViewModel.class);
+        CoursesViewModel coursesViewModel = new ViewModelProvider(this).get(CoursesViewModel.class);
+        SectionsViewModel sectionsViewModel = new ViewModelProvider(this).get(SectionsViewModel.class);
         lessonsViewModel = new ViewModelProvider(this).get(LessonsViewModel.class);
         downloadedVideoViewModel = new ViewModelProvider(this).get(DownloadedVideoViewModel.class);
         initializePlayer();
-//        binding.recyclerViewNextVideos.setLayoutManager(new LinearLayoutManager(getContext()));
+//        binding..setLayoutManager(new LinearLayoutManager(getContext()));
 //       if(!Constants.isDownloadVideoPlay) {
 //           adapter = new NextVideoAdapter(getContext(), lessonsViewModel, this);
 //           binding.recyclerViewNextVideos.setAdapter(adapter);
@@ -500,9 +469,7 @@ public class VideoPlayerFragment extends AppCompatActivity implements SetOnClick
             binding.playerView.setPlayer(player);
             // Build the media item.
             String folderName = "DownloadedVideos";
-            List<DownloadedCourse> videos = downloadedVideoViewModel.getDownloadedCourses().getValue();
-
-            String path = videos.get(Constants.current_downloaded_course_id).getDownloadedSections().get(Constants.current_downloaded_section_id).getDownloadedLessons().get(Constants.current_downloaded_lesson_id).getVideoPath();
+            String path = Constants.downloadedLessons.get(Constants.current_downloaded_lesson_id).getVideoPath();
             String name = path.substring(path.lastIndexOf("/")+1);
             //            File file = new File(getActivity().getFilesDir(), name);
 //            File directory = getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);

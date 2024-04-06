@@ -56,6 +56,11 @@ public class APIClient {
         requestQueue.add(stringRequest);
     }
 
+
+    public void updateServerForDownload(String apiUrl, Map<String, String> params, ApiResponseListener listener){
+
+    }
+
     public void login(String apiUrl, Map<String, String> params, ApiResponseListener listener) {
         String formattedUrl = formatUrl(apiUrl, params);
 
