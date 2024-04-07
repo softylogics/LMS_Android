@@ -2,6 +2,7 @@ package com.dusre.lms;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -33,7 +34,7 @@ import com.google.android.material.navigation.NavigationBarView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ActivityMainBinding binding;
+    public ActivityMainBinding binding;
     private CoursesViewModel coursesViewModel;
     private SectionsViewModel sectionsViewModel;
     private LessonsViewModel lessonsViewModel;
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             lessonsViewModel = new ViewModelProvider(this).get(LessonsViewModel.class);
             downloadedVideoViewModel = new ViewModelProvider(this).get(DownloadedVideoViewModel.class);
 
-            BottomNavigationView navView = findViewById(R.id.nav_view);
+
             // Passing each menu ID as a set of Ids because each
             // menu should be considered as top level destinations.
             AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -88,6 +89,22 @@ navController.addOnDestinationChangedListener(new NavController.OnDestinationCha
     }
 
 
+public void disableBottomNav(){
+    Log.d("bottom","disable");
+    for (int i = 0; i < binding.navView.getMenu().size(); i++) {
+        binding.navView.getMenu().getItem(i).setEnabled(false);
+    }
 
+}
+    public void enableBottomNav(){
+        Log.d("bottom","enable");
+        for (int i = 0; i < binding.navView.getMenu().size(); i++) {
+            binding.navView.getMenu().getItem(i).setEnabled(true);
+        }
+    }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 }

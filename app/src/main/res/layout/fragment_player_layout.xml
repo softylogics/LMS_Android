@@ -16,7 +16,36 @@
         android:background="?attr/colorPrimary"
         app:title="Your Toolbar Title"
 
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <!-- Logo -->
+            <ImageView
+                android:id="@+id/toolbarLogo"
+                android:layout_gravity="center"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/app_logo"
+
+                android:scaleType="fitCenter"
+                />
+
+            <!-- Title -->
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Sidra Naseem Skills Hub"
+                android:textColor="@color/textColor"
+                android:gravity="center"
+                android:fontFamily="@font/roboto_medium"
+                android:layout_marginStart="20dp"
+                android:textSize="18sp" />
+        </LinearLayout>
+    </com.google.android.material.appbar.MaterialToolbar>
     <LinearLayout
         android:id="@+id/top_controller"
         android:layout_width="match_parent"
@@ -39,6 +68,7 @@
             android:layout_gravity="center"
             android:singleLine="true"
             android:textColor="@color/white"
+            android:textSize="12sp"
             android:marqueeRepeatLimit="marquee_forever"
             android:ellipsize="marquee" />
         <ImageButton

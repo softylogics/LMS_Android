@@ -1,9 +1,12 @@
 package com.dusre.lms.Util;
 
 import android.content.Context;
+
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -35,7 +38,7 @@ public class APIClient {
         void onFailure(VolleyError error);
     }
 
-    public void fetchDataFromApi(String apiUrl, Map<String, String> params, ApiResponseListener listener) {
+    public void fetchDataFromApi(String apiUrl, Map<String, String> params, ApiResponseListener listener, String tag) {
         String formattedUrl = formatUrl(apiUrl, params);
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedUrl,
@@ -51,6 +54,23 @@ public class APIClient {
             }
 
 
+        });
+        stringRequest.setTag(tag);
+        stringRequest.setRetryPolicy(new RetryPolicy() {
+            @Override
+            public int getCurrentTimeout() {
+                return 50000;
+            }
+
+            @Override
+            public int getCurrentRetryCount() {
+                return 50000;
+            }
+
+            @Override
+            public void retry(VolleyError error) throws VolleyError {
+
+            }
         });
 
         requestQueue.add(stringRequest);
@@ -79,7 +99,7 @@ public class APIClient {
 
         });
 
-        requestQueue.add(stringRequest);
+
     }
 
 
@@ -89,6 +109,10 @@ public class APIClient {
             builder.appendQueryParameter(entry.getKey(), entry.getValue());
         }
         return builder.build().toString();
+    }
+
+    public void cancelRequest(String tag){
+        requestQueue.cancelAll(tag);
     }
 
     public static String getProgressDisplayLine(long currentBytes, long totalBytes) {

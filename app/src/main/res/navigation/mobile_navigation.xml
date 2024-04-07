@@ -29,6 +29,9 @@
 <!--            app:enterAnim="@anim/slide_in"-->
 <!--            app:exitAnim="@anim/slide_out"/>-->
 
+        <action
+            android:id="@+id/action_navigation_sections_to_navigation_my_courses"
+            app:destination="@id/navigation_my_courses" />
     </fragment>
     <fragment
         android:id="@+id/navigation_account"

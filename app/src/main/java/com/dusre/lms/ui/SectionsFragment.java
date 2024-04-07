@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -102,6 +103,10 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
     private BroadcastReceiver onDownloadComplete;
     private int lesson_id = -1;
     private BroadcastReceiver onDownloadNotoficationClicked;
+    private boolean isFragmentAttached = false;
+    private APIClient myVolleyApiClient;
+    private boolean fetching = false;
+    private NavController navController;
 
     public SectionsFragment() {
     }
@@ -133,15 +138,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         gson = new Gson();
 
         // Populate course list (You may fetch it from database or API)
-        if(checkInternet()!=0) {
-            if(sectionsViewModel.getSections().getValue()==null) {
-                binding.progressBarCourseDetail.setVisibility(View.VISIBLE);
-                callAPIForCoursesSections();
-            }
-        }
-        else{
-            Toast.makeText(getContext(), "No internet connection", Toast.LENGTH_SHORT).show();
-        }
+
 
         binding.swipeRefreshLayoutCourseDetail.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -174,21 +171,39 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
                     DownloadManager.Query query = new DownloadManager.Query();
                     query.setFilterById(downloadID);
                     Cursor cursor = downloadManager.query(query);
-                    if (cursor != null && cursor.moveToFirst()) {
+                    if (cursor.moveToFirst()) {
+
+                        int statusIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
+                        int status = cursor.getInt(statusIndex);
+                        Log.d("download" , status+"");
+                        Log.d("download" , statusIndex+"");
+
+                        if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                            // Download completed successfully
+                            Log.d("download", "in if if receiver");
+                            String filePath = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                            cursor.close();
+                            downloadedVideo.setVideo_file_path(filePath);
+                            dbHelper.addDownloadedVideo(downloadedVideo);
+                            // Handle successful download
+                            Toast.makeText(getContext(), "Download Completed", Toast.LENGTH_SHORT).show();
+        //                    binding.progressBarCourseDetail.setVisibility(View.VISIBLE);
+        //                    updateLessonOnServer();
+                        } else if (status == DownloadManager.STATUS_FAILED) {
+                            // Download failed
+                            // Handle download failure
+                            Toast.makeText(getContext(), "Download Failed", Toast.LENGTH_SHORT).show();
+                        } else if (status == DownloadManager.STATUS_PAUSED) {
+                            // Download paused
+                            // Handle download pause
+                            Toast.makeText(getContext(), "Download Paused", Toast.LENGTH_SHORT).show();
+                        }
                         // Retrieve the file path
-                        Log.d("download", "in if if receiver");
-                        String filePath = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-                        cursor.close();
-                        downloadedVideo.setVideo_file_path(filePath);
-                        dbHelper.addDownloadedVideo(downloadedVideo);
 
                         // Store the file path for later access (e.g., in SharedPreferences)
                         // Here, for simplicity, we'll just use a class-level variable
 
                     }
-                    Toast.makeText(getContext(), "Download Completed", Toast.LENGTH_SHORT).show();
-                    binding.progressBarCourseDetail.setVisibility(View.VISIBLE);
-//                    updateLessonOnServer();
                 }
                 lesson_id = -1;
                 downloadID = -1;
@@ -216,38 +231,15 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
     }
 
     private void updateLessonOnServer() {
-        APIClient myVolleyApiClient = new APIClient(getContext());
-
-        APIClient.ApiResponseListener listener = new APIClient.ApiResponseListener() {
-            @Override
-            public void onSuccess(String response) {
-                // Handle successful response
-
-                binding.progressBarCourseDetail.setVisibility(View.GONE);
-                sectionsViewModel.getSections().setValue(parseJsonToCourseList(response));
-                Log.d("API Response", response);
-            }
-
-            @Override
-            public void onFailure(VolleyError error) {
-                // Handle failure
-                binding.progressBarCourseDetail.setVisibility(View.GONE);
-                Log.d("API Response", error.toString());
-            }
-        };
-
-
-        Map<String, String> params = new HashMap<>();
-        params.put("auth_token", UserPreferences.getString(Constants.TOKEN));
-        params.put("course_id", String.valueOf(coursesViewModel.getMyCourses().getValue().get(Constants.current_course_id).id));
-
-        myVolleyApiClient.fetchDataFromApi(Constants.url+"sections", params, listener);
 
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        navController = Navigation.findNavController(view);
+        implementBackButtonFunctionality(view);
+
 //        navController = Navigation.findNavController(view);
     }
 
@@ -257,23 +249,31 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         return (int) m;
     }
     private void callAPIForCoursesSections() {
-        APIClient myVolleyApiClient = new APIClient(getContext());
+        fetching = true;
+        myVolleyApiClient = new APIClient(getContext());
 
         APIClient.ApiResponseListener listener = new APIClient.ApiResponseListener() {
             @Override
             public void onSuccess(String response) {
                 // Handle successful response
-
-                binding.progressBarCourseDetail.setVisibility(View.GONE);
-                sectionsViewModel.getSections().setValue(parseJsonToCourseList(response));
-                Log.d("API Response", response);
+                if(isFragmentAttached) {
+                    binding.progressBarCourseDetail.setVisibility(View.GONE);
+                    sectionsViewModel.getSections().setValue(parseJsonToCourseList(response));
+                    Log.d("API Response", response);
+                    ((MainActivity) requireActivity()).enableBottomNav();
+                    fetching = false;
+                }
             }
 
             @Override
             public void onFailure(VolleyError error) {
                 // Handle failure
-                binding.progressBarCourseDetail.setVisibility(View.GONE);
-                Log.d("API Response", error.toString());
+                if(isFragmentAttached) {
+                    binding.progressBarCourseDetail.setVisibility(View.GONE);
+                    Log.d("API Response", error.toString());
+                    ((MainActivity) requireActivity()).enableBottomNav();
+                    fetching = false;
+                }
             }
         };
 
@@ -282,7 +282,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         params.put("auth_token", UserPreferences.getString(Constants.TOKEN));
         params.put("course_id", String.valueOf(coursesViewModel.getMyCourses().getValue().get(Constants.current_course_id).id));
 
-        myVolleyApiClient.fetchDataFromApi(Constants.url+"sections", params, listener);
+        myVolleyApiClient.fetchDataFromApi(Constants.url+"sections", params, listener, Constants.SECTIONS_FRAGMENT);
     }
 
     public List<Section> parseJsonToCourseList(String jsonString) {
@@ -349,7 +349,7 @@ private void beginDownload(String url){
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url))
 
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)// Visibility of the download Notification
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)// Visibility of the download Notification
                 .setDestinationInExternalFilesDir(getContext(), Environment.DIRECTORY_DOWNLOADS, fileName)
                 .setTitle(fileName)// Title of the Download Notification
                 .setDescription("Downloading")// Description of the Download Notification
@@ -628,4 +628,53 @@ private void beginDownload(String url){
 
     }
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        isFragmentAttached = true;
+
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        isFragmentAttached = false;
+
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if(checkInternet()!=0) {
+            if(sectionsViewModel.getSections().getValue()==null) {
+                ((MainActivity) requireActivity()).disableBottomNav();
+                binding.progressBarCourseDetail.setVisibility(View.VISIBLE);
+
+                callAPIForCoursesSections();
+            }
+        }
+        else{
+            Toast.makeText(getContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void implementBackButtonFunctionality(View view) {
+
+
+        // This callback will only be called when MyFragment is at least Started.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                if (fetching) {
+                    Toast.makeText(getContext(), "Please wait for the process to complete." , Toast.LENGTH_SHORT).show();
+                } else {
+                    navController.navigate(R.id.action_navigation_sections_to_navigation_my_courses);
+                }
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(getActivity(), callback);
+
+
+    }
 }
