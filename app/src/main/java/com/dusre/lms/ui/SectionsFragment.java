@@ -5,6 +5,7 @@ import static android.content.Context.DOWNLOAD_SERVICE;
 import android.Manifest;
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,6 +18,7 @@ import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +28,7 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -103,7 +106,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         binding = CourseDetailLayoutBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         binding.recyclerViewCourseDetail.setLayoutManager(new LinearLayoutManager(requireContext()));
-
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         coursesViewModel = new ViewModelProvider(requireActivity()).get(CoursesViewModel.class);
         sectionsViewModel = new ViewModelProvider(requireActivity()).get(SectionsViewModel.class);
         lessonsViewModel = new ViewModelProvider(requireActivity()).get(LessonsViewModel.class);
@@ -171,13 +174,16 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
                             downloadedVideo.setUpdateOnServer("0");
                             dbHelper.addDownloadedVideo(downloadedVideo);
                             // Handle successful download
-                            Toast.makeText(getContext(), "Download Completed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Download Completed. You can find it in Downloaded lectures.", Toast.LENGTH_LONG).show();
+                            hideDownloadProgressBar();
+
                             binding.progressBarCourseDetail.setVisibility(View.VISIBLE);
                             ((MainActivity) requireActivity()).disableBottomNav();
                             updateLessonOnServer();
                         } else if (status == DownloadManager.STATUS_FAILED) {
                             // Download failed
                             // Handle download failure
+                            hideDownloadProgressBar();
                             Toast.makeText(getContext(), "Download Failed", Toast.LENGTH_SHORT).show();
                         } else if (status == DownloadManager.STATUS_PAUSED) {
                             // Download paused
@@ -364,28 +370,72 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 
 private void beginDownload(String url){
     if (downloadID == -1) {
-
-
+        showDownloadProgressBar();
+        Toast.makeText(getContext(), "Download started..." , Toast.LENGTH_LONG).show();
         String fileName = url.substring(url.lastIndexOf('/') + 1);
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url))
 
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)// Visibility of the download Notification
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)// Visibility of the download Notification
                 .setDestinationInExternalFilesDir(getContext(), getActivity().getFilesDir().getAbsolutePath(), fileName)
-                .setTitle(fileName)// Title of the Download Notification
-                .setDescription("Downloading")// Description of the Download Notification
+//                .setTitle(fileName)// Title of the Download Notification
+//                .setDescription("Downloading")// Description of the Download Notification
                 .setAllowedOverMetered(true)// Set if download is allowed on Mobile network
                 .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE | DownloadManager.Request.NETWORK_WIFI)
                 .setAllowedOverRoaming(true);// Set if download is allowed on roaming network
 
         downloadManager = (DownloadManager) getActivity().getSystemService(DOWNLOAD_SERVICE);
         downloadID = downloadManager.enqueue(request);// enqueue puts the download request in the queue.
+
+        final Handler handler = new Handler();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                Cursor cursor = downloadManager.query(new DownloadManager.Query().setFilterById(downloadID));
+                if (cursor.moveToFirst()) {
+                    int bytesDownloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                    int bytesTotal = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                    int progress = (int) ((bytesDownloaded * 100L) / bytesTotal);
+
+
+                    // Update your custom progress dialog with the progress value
+                    updateProgressDialog(progress);
+
+                    if (progress < 100) {
+                        handler.postDelayed(this, 1000); // Poll every second
+                    }
+                }
+                cursor.close();
+            }
+        };
+        handler.post(runnable);
     }
     else{
         Toast.makeText(getContext(), "Already Downloading", Toast.LENGTH_SHORT).show();
     }
 
     }
+
+    private void showDownloadProgressBar(){
+
+        binding.downloadProgressLayout.setVisibility(View.VISIBLE);
+        ((MainActivity) requireActivity()).disableBottomNav();
+        binding.recyclerViewCourseDetail.setEnabled(false);
+        binding.recyclerViewCourseDetail.setAlpha(0.3f);
+    }
+
+    private void hideDownloadProgressBar(){
+        binding.downloadProgressLayout.setVisibility(View.GONE);
+        ((MainActivity) requireActivity()).enableBottomNav();
+        binding.recyclerViewCourseDetail.setEnabled(true);
+        binding.recyclerViewCourseDetail.setAlpha(1f);
+    }
+    private void updateProgressDialog(int progress) {
+        // Update your custom progress dialog with the progress value
+        binding.downloadProgressBarCourseDetail.setProgress(progress);
+        binding.txtDownloadingProgress.setText(progress+"%");
+    }
+
     private String getCourseTitle(String courseId) {
 
         for(Course course: coursesViewModel.getMyCourses().getValue()){
@@ -460,18 +510,7 @@ private void beginDownload(String url){
 
         return false;
     }
-//    public void showDialog() {
-//        pDialog = new ProgressDialog(getActivity());
-//        pDialog.setMessage("Downloading file. Please wait...");
-//        pDialog.setIndeterminate(false);
-//        pDialog.setMax(100);
-//        pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-//        pDialog.setCancelable(false);
-//        pDialog.show();
-//
-//
-//
-//    }
+
 //    class DownloadFileFromURL extends AsyncTask<String, String, String> {
 //
 //
@@ -689,7 +728,7 @@ private void beginDownload(String url){
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
-                if (fetching) {
+                if (fetching || downloadID!=-1) {
                     Toast.makeText(getContext(), "Please wait for the process to complete." , Toast.LENGTH_SHORT).show();
                 } else {
                     navController.navigateUp();

@@ -89,6 +89,37 @@
             android:layout_gravity="center"
 
             />
+        <LinearLayout
+            android:id="@+id/downloadProgressLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:padding="10dp"
+            android:visibility="gone"
+            android:background="@drawable/rounded_bg_course_item"
+            android:layout_gravity="center"
+            android:indeterminate="false"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Downloading..."/>
+        <ProgressBar
+            android:id="@+id/downloadProgressBarCourseDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:visibility="visible"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+
+            />
+            <TextView
+                android:id="@+id/txtDownloadingProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10%"/>
+
+        </LinearLayout>
     </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
