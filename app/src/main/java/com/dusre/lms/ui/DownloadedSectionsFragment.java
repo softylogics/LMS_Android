@@ -1,61 +1,32 @@
 package com.dusre.lms.ui;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.android.volley.VolleyError;
-import com.dusre.lms.MainActivity;
-import com.dusre.lms.R;
-import com.dusre.lms.Util.APIClient;
 import com.dusre.lms.Util.Constants;
 import com.dusre.lms.Util.DatabaseHelper;
+import com.dusre.lms.VideoPlayerActivity;
 import com.dusre.lms.adapters.DownloadedSectionsAdapter;
 import com.dusre.lms.databinding.DownloadedCourseDetailLayoutBinding;
 import com.dusre.lms.listeners.SetOnClickListener;
-import com.dusre.lms.model.Course;
 
 import com.dusre.lms.model.DownloadedCourse;
-import com.dusre.lms.model.DownloadedVideo;
-import com.dusre.lms.model.Section;
 import com.dusre.lms.viewmodel.DownloadedVideoViewModel;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Type;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class DownloadedSectionsFragment extends Fragment implements SetOnClickListener {
 
@@ -146,7 +117,7 @@ public class DownloadedSectionsFragment extends Fragment implements SetOnClickLi
         Constants.isDownloadVideoPlay = true;
         Constants.current_downloaded_lesson_id = position;
         Constants.downloadedLessons = downloadedVideoViewModel.getDownloadedCourses().getValue().get(Constants.current_downloaded_course_id).getDownloadedSections().get(Constants.current_downloaded_section_id).getDownloadedLessons();
-        startActivity(new Intent(getActivity(), VideoPlayerFragment.class));
+        startActivity(new Intent(getActivity(), VideoPlayerActivity.class));
 
 //        navController.navigate(R.id.action_navigation_downloaded_sections_to_navigation_video_player);
 
@@ -159,6 +130,7 @@ public class DownloadedSectionsFragment extends Fragment implements SetOnClickLi
 
     @Override
     public void onDownloadDeleteVideo(int position) {
+        //todo: complete this code
 
     }
 

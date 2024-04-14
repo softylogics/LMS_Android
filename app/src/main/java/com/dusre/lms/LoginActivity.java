@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.splashscreen.SplashScreen;
 
 import com.android.volley.VolleyError;
 import com.dusre.lms.Util.APIClient;
@@ -37,6 +38,7 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         binding = FragmentLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -92,7 +94,7 @@ public class LoginActivity extends AppCompatActivity {
                         UserPreferences.setBoolean(Constants.LOGGED_IN, true);
                         UserPreferences.setString(Constants.TOKEN, jsonObject.get("token").getAsString());
                         UserPreferences.setString(Constants.USERNAME, jsonObject.get("first_name").getAsString() + " " + jsonObject.get("last_name").getAsString());
-                        hidePB();
+//                        hidePB();
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
                         finish();
                     }

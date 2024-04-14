@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:id="@+id/linear_layout"
+        android:id="@+id/linear_layout_course_detail_item"
         android:padding="20dp"
         android:background="@drawable/rounded_bg_course_item">
 
@@ -39,7 +39,7 @@
                     android:ellipsize="end"
                     android:text="Communication with client and marketing proposals"
                     android:textColor="@color/dark_gray"
-                    android:textSize="15sp"
+                    android:textSize="16sp"
                     />
 
                 <LinearLayout

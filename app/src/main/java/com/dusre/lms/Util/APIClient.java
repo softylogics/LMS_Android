@@ -2,7 +2,7 @@ package com.dusre.lms.Util;
 
 import android.content.Context;
 
-import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -10,17 +10,10 @@ import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import android.content.Context;
-import android.net.Uri;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
+import android.net.Uri;
+
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -75,10 +68,62 @@ public class APIClient {
 
         requestQueue.add(stringRequest);
     }
+    public void saveDownloadProgress(String apiUrl, Map<String, String> params, ApiResponseListener listener) {
 
 
-    public void updateServerForDownload(String apiUrl, Map<String, String> params, ApiResponseListener listener){
 
+        // Create a StringRequest with POST method
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, apiUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Handle successful response
+                        listener.onSuccess(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Handle error response
+                listener.onFailure(error);
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                // Add any necessary headers here
+                return headers;
+            }
+        };
+
+        // Add the request to the Volley request queue
+        requestQueue.add(stringRequest);
+    }
+
+
+    public void updateServerForDownload(String apiUrl, Map<String, String> params, ApiResponseListener listener, String tag){
+        String formattedUrl = formatUrl(apiUrl, params);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, formattedUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        listener.onSuccess(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                listener.onFailure(error);
+            }
+
+
+        });
+        stringRequest.setTag(tag);
+        requestQueue.add(stringRequest);
     }
 
     public void login(String apiUrl, Map<String, String> params, ApiResponseListener listener) {
@@ -99,7 +144,7 @@ public class APIClient {
 
         });
 
-
+        requestQueue.add(stringRequest);
     }
 
 

@@ -11,7 +11,7 @@ public class DownloadedVideo {
     private String section_id;
     private String section_title;
     private String video_file_path;
-    private boolean isUpdateOnServer;
+    private String isUpdateOnServer;
 
 
     public String getId() {
@@ -79,11 +79,11 @@ public class DownloadedVideo {
         this.video_file_path = videoFilePath;
     }
 
-    public boolean isUpdateOnServer() {
+    public String isUpdateOnServer() {
         return isUpdateOnServer;
     }
 
-    public void setUpdateOnServer(boolean updateOnServer) {
+    public void setUpdateOnServer(String updateOnServer) {
         isUpdateOnServer = updateOnServer;
     }
 }

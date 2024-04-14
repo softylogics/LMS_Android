@@ -8,6 +8,38 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:407400434138:android:a837d138cd52e5f98758e3",
+        "android_client_info": {
+          "package_name": "apps.ssatechs.sidranaseemlms"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "407400434138-foh7avj3rtq237dc3p4pp4b2lr9u9nef.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoPpoV5dGYFF5eeFEs0igyt6AXVnrJ0wY"
+        },
+        {
+          "current_key": "AIzaSyC3swodJ0JVi6ilfiP3RdmRr3zo5GronNo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "407400434138-foh7avj3rtq237dc3p4pp4b2lr9u9nef.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:407400434138:android:2c8e939606e545838758e3",
         "android_client_info": {
           "package_name": "com.dusre.lms"
@@ -21,10 +53,10 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC3swodJ0JVi6ilfiP3RdmRr3zo5GronNo"
+          "current_key": "AIzaSyCoPpoV5dGYFF5eeFEs0igyt6AXVnrJ0wY"
         },
         {
-          "current_key": "AIzaSyCoPpoV5dGYFF5eeFEs0igyt6AXVnrJ0wY"
+          "current_key": "AIzaSyC3swodJ0JVi6ilfiP3RdmRr3zo5GronNo"
         }
       ],
       "services": {
@@ -53,10 +85,10 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC3swodJ0JVi6ilfiP3RdmRr3zo5GronNo"
+          "current_key": "AIzaSyCoPpoV5dGYFF5eeFEs0igyt6AXVnrJ0wY"
         },
         {
-          "current_key": "AIzaSyCoPpoV5dGYFF5eeFEs0igyt6AXVnrJ0wY"
+          "current_key": "AIzaSyC3swodJ0JVi6ilfiP3RdmRr3zo5GronNo"
         }
       ],
       "services": {

@@ -39,11 +39,12 @@ public class MainActivity extends AppCompatActivity {
     private SectionsViewModel sectionsViewModel;
     private LessonsViewModel lessonsViewModel;
     private DownloadedVideoViewModel downloadedVideoViewModel;
+    private NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
-//        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
 
         UserPreferences.init(this);
         if(!UserPreferences.getBoolean(Constants.LOGGED_IN)){
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
                     R.id.navigation_my_courses, R.id.navigation_account)
                     .build();
-            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+            navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
 navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
     @Override
     public void onDestinationChanged(@NonNull NavController navController, @NonNull NavDestination navDestination, @Nullable Bundle bundle) {
@@ -103,8 +104,12 @@ public void disableBottomNav(){
         }
     }
 
+
+
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
+    public boolean onSupportNavigateUp() {
+
+        return navController.navigateUp();
+
     }
 }

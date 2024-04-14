@@ -17,13 +17,14 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
+        android:theme="@style/Theme.LMS.Starting"
         tools:targetApi="31">
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
+            android:theme="@style/Theme.LMS.Starting"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,9 +37,10 @@
             android:exported="false"
             android:screenOrientation="portrait"
             android:label="Login"/>
-<activity android:name=".ui.VideoPlayerFragment"
+<activity android:name=".VideoPlayerActivity"
     android:exported="false"
     android:label="Video Player"
+    android:theme="@style/BaseAppTheme"
     android:configChanges="keyboardHidden|orientation|screenSize"/>
         <meta-data
             android:name="preloaded_fonts"

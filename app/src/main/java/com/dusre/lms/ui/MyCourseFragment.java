@@ -30,7 +30,6 @@ import com.dusre.lms.databinding.FragmentMyCourseBinding;
 import com.dusre.lms.listeners.SetOnClickListener;
 import com.dusre.lms.model.Course;
 import com.dusre.lms.viewmodel.CoursesViewModel;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -239,11 +238,43 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
             if(courseList.isEmpty()) {
                 ((MainActivity) requireActivity()).disableBottomNav();
                 binding.progressBar.setVisibility(View.VISIBLE);
-                callAPIForCourses();
+                if(!UserPreferences.getBoolean(Constants.ALREADY_INSTALLED)){
+                    resetDownloadsOnServer();
+                }
+                else {
+                    callAPIForCourses();
+                }
             }
         }
         else{
             Toast.makeText(getContext(), "No internet connection", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void resetDownloadsOnServer() {
+        myVolleyApiClient = new APIClient(getContext());
+
+        APIClient.ApiResponseListener listener = new APIClient.ApiResponseListener() {
+            @Override
+            public void onSuccess(String response) {
+
+                Log.d("API Response", response);
+                UserPreferences.setBoolean(Constants.ALREADY_INSTALLED, true);
+                callAPIForCourses();
+            }
+
+            @Override
+            public void onFailure(VolleyError error) {
+
+                Log.d("API Response", error.toString());
+                resetDownloadsOnServer();
+            }
+        };
+
+
+        Map<String, String> params = new HashMap<>();
+        params.put("auth_token", UserPreferences.getString(Constants.TOKEN));
+
+        myVolleyApiClient.fetchDataFromApi(Constants.url+"downloaded_lesson_reset", params, listener , Constants.MY_COURSE_FRAGMENT);
     }
 }

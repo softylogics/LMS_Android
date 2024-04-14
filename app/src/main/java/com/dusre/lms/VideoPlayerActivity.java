@@ -1,4 +1,4 @@
-package com.dusre.lms.ui;
+package com.dusre.lms;
 
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
@@ -20,22 +20,15 @@ import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.PlayerControlView;
 
-import com.dusre.lms.R;
 import com.dusre.lms.Util.Constants;
-import com.dusre.lms.adapters.NextVideoAdapter;
 import com.dusre.lms.databinding.FragmentPlayerLayoutBinding;
 import com.dusre.lms.listeners.SetOnClickListener;
-import com.dusre.lms.model.DownloadedCourse;
-import com.dusre.lms.model.Lesson;
 import com.dusre.lms.viewmodel.CoursesViewModel;
 import com.dusre.lms.viewmodel.DownloadedVideoViewModel;
 import com.dusre.lms.viewmodel.LessonsViewModel;
 import com.dusre.lms.viewmodel.SectionsViewModel;
-import com.google.gson.Gson;
 
-import java.util.List;
-
-public class VideoPlayerFragment extends AppCompatActivity implements SetOnClickListener {
+public class VideoPlayerActivity extends AppCompatActivity implements SetOnClickListener {
 
     private FragmentPlayerLayoutBinding binding;
 

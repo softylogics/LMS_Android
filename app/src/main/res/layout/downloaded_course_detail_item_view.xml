@@ -39,7 +39,7 @@
                     android:ellipsize="end"
                     android:text="Communication with client and marketing proposals"
                     android:textColor="@color/dark_gray"
-                    android:textSize="15sp"/>
+                    android:textSize="16sp"/>
 
 
 

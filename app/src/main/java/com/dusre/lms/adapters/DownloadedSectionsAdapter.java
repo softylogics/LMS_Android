@@ -66,7 +66,7 @@ public class DownloadedSectionsAdapter extends RecyclerView.Adapter<DownloadedSe
         holder.binding.downloadedChildRv.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext()));
         holder.binding.downloadedChildRv.setHasFixedSize(true);
         holder.binding.downloadedChildRv.setAdapter(adapter);
-        holder.binding.downloadedArroImageview.setOnClickListener(v -> {
+        holder.binding.downloadedLinearLayout.setOnClickListener(v -> {
             if(section.is_expandable){
                 section.setIs_expandable(false);
             }

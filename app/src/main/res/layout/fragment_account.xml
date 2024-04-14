@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:gravity="center"
     tools:context=".ui.AccountFragment"
-    android:background="?attr/colorPrimary"
+
    >
 
    <com.google.android.material.imageview.ShapeableImageView

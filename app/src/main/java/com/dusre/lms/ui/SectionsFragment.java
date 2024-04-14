@@ -3,11 +3,8 @@ package com.dusre.lms.ui;
 import static android.content.Context.DOWNLOAD_SERVICE;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DownloadManager;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,10 +15,8 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,20 +35,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.android.volley.VolleyError;
-import com.downloader.Error;
-import com.downloader.OnCancelListener;
-import com.downloader.OnDownloadListener;
-import com.downloader.OnPauseListener;
-import com.downloader.OnProgressListener;
-import com.downloader.OnStartOrResumeListener;
-import com.downloader.PRDownloader;
-import com.downloader.Progress;
 import com.dusre.lms.MainActivity;
 import com.dusre.lms.R;
 import com.dusre.lms.Util.APIClient;
 import com.dusre.lms.Util.Constants;
 import com.dusre.lms.Util.DatabaseHelper;
 import com.dusre.lms.Util.UserPreferences;
+import com.dusre.lms.VideoPlayerActivity;
 import com.dusre.lms.adapters.SectionsAdapter;
 import com.dusre.lms.databinding.CourseDetailLayoutBinding;
 import com.dusre.lms.listeners.SetOnClickListener;
@@ -68,19 +56,12 @@ import com.dusre.lms.viewmodel.CoursesViewModel;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Type;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
+//todo: if user closes app during download
 public class SectionsFragment extends Fragment implements SetOnClickListener {
 
     private CourseDetailLayoutBinding binding;
@@ -107,6 +88,8 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
     private APIClient myVolleyApiClient;
     private boolean fetching = false;
     private NavController navController;
+    private boolean updatingOnServer = false;
+    private SectionsAdapter sectionsAdapter;
 
     public SectionsFragment() {
     }
@@ -126,7 +109,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         lessonsViewModel = new ViewModelProvider(requireActivity()).get(LessonsViewModel.class);
         // Initialize course list and adapter
 
-        SectionsAdapter sectionsAdapter = new SectionsAdapter(requireContext(), sectionsViewModel, this);
+        sectionsAdapter = new SectionsAdapter(requireContext(), sectionsViewModel, this);
         sectionsViewModel.getSections().setValue(null);
 
         Course course = coursesViewModel.getMyCourses().getValue().get(Constants.current_course_id);
@@ -160,6 +143,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         });
 
         dbHelper = new DatabaseHelper(getContext());
+        myVolleyApiClient = new APIClient(getContext());
         onDownloadComplete = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -184,11 +168,13 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
                             String filePath = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
                             cursor.close();
                             downloadedVideo.setVideo_file_path(filePath);
+                            downloadedVideo.setUpdateOnServer("0");
                             dbHelper.addDownloadedVideo(downloadedVideo);
                             // Handle successful download
                             Toast.makeText(getContext(), "Download Completed", Toast.LENGTH_SHORT).show();
-        //                    binding.progressBarCourseDetail.setVisibility(View.VISIBLE);
-        //                    updateLessonOnServer();
+                            binding.progressBarCourseDetail.setVisibility(View.VISIBLE);
+                            ((MainActivity) requireActivity()).disableBottomNav();
+                            updateLessonOnServer();
                         } else if (status == DownloadManager.STATUS_FAILED) {
                             // Download failed
                             // Handle download failure
@@ -231,6 +217,41 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
     }
 
     private void updateLessonOnServer() {
+        updatingOnServer = true;
+        APIClient.ApiResponseListener listener = new APIClient.ApiResponseListener() {
+            @Override
+            public void onSuccess(String response) {
+
+
+                //sectionsAdapter.reload();
+                Log.d("API Response", response);
+                ((MainActivity) requireActivity()).enableBottomNav();
+                callAPIForCoursesSections();
+
+                updatingOnServer = false;
+            }
+
+            @Override
+            public void onFailure(VolleyError error) {
+                //todo: handle video deletion/updating the server whenever possible if not successful in first go
+                //todo: what if the user changes the section id and lesson id during the download
+                binding.progressBarCourseDetail.setVisibility(View.GONE);
+
+                Log.d("API Response", error.toString());
+
+
+                updatingOnServer = false;
+            }
+        };
+        Map<String, String> params = new HashMap<>();
+        params.put("auth_token", UserPreferences.getString(Constants.TOKEN));
+        params.put("lesson_id", String.valueOf(lesson_id));
+
+        params.put("status", String.valueOf("1"));
+
+        myVolleyApiClient.saveDownloadProgress(Constants.url+"lesson_downloaded", params, listener);
+
+
 
     }
 
@@ -250,7 +271,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
     }
     private void callAPIForCoursesSections() {
         fetching = true;
-        myVolleyApiClient = new APIClient(getContext());
+
 
         APIClient.ApiResponseListener listener = new APIClient.ApiResponseListener() {
             @Override
@@ -328,8 +349,8 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
                 downloadedVideo.setCourse_title(getCourseTitle(lesson.getCourse_id()));
                 downloadedVideo.setSection_id(lesson.getSection_id());
                 downloadedVideo.setSection_title(getSectionTitle(lesson.getSection_id()));
-                downloadedVideo.setUpdateOnServer(false);
-                //todo: start from here
+                downloadedVideo.setUpdateOnServer("0");
+
                 lesson_id = Integer.parseInt(lesson.getId());
                 beginDownload(lesson.getVideo_url_web());
 
@@ -349,12 +370,14 @@ private void beginDownload(String url){
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url))
 
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)// Visibility of the download Notification
-                .setDestinationInExternalFilesDir(getContext(), Environment.DIRECTORY_DOWNLOADS, fileName)
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)// Visibility of the download Notification
+                .setDestinationInExternalFilesDir(getContext(), getActivity().getFilesDir().getAbsolutePath(), fileName)
                 .setTitle(fileName)// Title of the Download Notification
                 .setDescription("Downloading")// Description of the Download Notification
                 .setAllowedOverMetered(true)// Set if download is allowed on Mobile network
+                .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE | DownloadManager.Request.NETWORK_WIFI)
                 .setAllowedOverRoaming(true);// Set if download is allowed on roaming network
+
         downloadManager = (DownloadManager) getActivity().getSystemService(DOWNLOAD_SERVICE);
         downloadID = downloadManager.enqueue(request);// enqueue puts the download request in the queue.
     }
@@ -389,7 +412,7 @@ private void beginDownload(String url){
         Constants.current_lesson_id = position;
         lessonsViewModel.setMyLessons(sectionsViewModel.getSections().getValue().get(Constants.current_section_id).getLessons());
         Constants.lessons = sectionsViewModel.getSections().getValue().get(Constants.current_section_id).getLessons();
-        startActivity(new Intent(getActivity(), VideoPlayerFragment.class));
+        startActivity(new Intent(getActivity(), VideoPlayerActivity.class));
 //        navController.navigate(R.id.action_navigation_sections_to_navigation_video_player);
 
     }
@@ -669,7 +692,7 @@ private void beginDownload(String url){
                 if (fetching) {
                     Toast.makeText(getContext(), "Please wait for the process to complete." , Toast.LENGTH_SHORT).show();
                 } else {
-                    navController.navigate(R.id.action_navigation_sections_to_navigation_my_courses);
+                    navController.navigateUp();
                 }
             }
         };
@@ -677,4 +700,5 @@ private void beginDownload(String url){
 
 
     }
+
 }

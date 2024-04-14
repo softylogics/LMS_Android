@@ -57,6 +57,7 @@
 
     <!-- Radio -->
     <color name="radio_bg_color">#0277bd</color>
+    <color name="mainbody">#FFF5F5F5</color>
     <array name="radio_colors">
         <!--<item>#4fc3f7</item>
         <item>#29b6f6</item>-->

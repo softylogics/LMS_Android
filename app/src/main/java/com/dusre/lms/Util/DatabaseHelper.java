@@ -1,6 +1,5 @@
 package com.dusre.lms.Util;
 
-import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -32,6 +31,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_SECTION_ID = "section_id";
     private static final String KEY_SECTION_TITLE = "section_title";
     private static final String KEY_VIDEO_FILE_PATH = "video_file_path";
+    private static final String KEY_IS_UPDATED_ON_SERVER = "isDownloaded";
+
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -48,7 +49,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + KEY_COURSE_TITLE + " TEXT,"
                 + KEY_SECTION_ID + " TEXT,"
                 + KEY_SECTION_TITLE + " TEXT,"
-                + KEY_VIDEO_FILE_PATH + " TEXT"
+                + KEY_VIDEO_FILE_PATH + " TEXT,"
+                + KEY_IS_UPDATED_ON_SERVER + " TEXT"
                 + ")";
         // Create table
         db.execSQL(CREATE_TABLE);
@@ -76,7 +78,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_SECTION_ID, downloadedVideo.getSection_id());
         values.put(KEY_SECTION_TITLE, downloadedVideo.getSection_title());
         values.put(KEY_VIDEO_FILE_PATH, downloadedVideo.getVideo_file_path());
-
+        values.put(KEY_IS_UPDATED_ON_SERVER, downloadedVideo.isUpdateOnServer());
         // Insert row
         long id = db.insert(TABLE_DOWNLOADED_VIDEOS, null, values);
 
@@ -108,7 +110,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 downloadedVideo.setSection_id(cursor.getString(cursor.getColumnIndex(KEY_SECTION_ID)));
                 downloadedVideo.setSection_title(cursor.getString(cursor.getColumnIndex(KEY_SECTION_TITLE)));
                 downloadedVideo.setVideo_file_path(cursor.getString(cursor.getColumnIndex(KEY_VIDEO_FILE_PATH)));
-
+                downloadedVideo.setUpdateOnServer(cursor.getString(cursor.getColumnIndex(KEY_IS_UPDATED_ON_SERVER)));
                 // Adding downloaded video to list
                 downloadedVideosList.add(downloadedVideo);
             } while (cursor.moveToNext());

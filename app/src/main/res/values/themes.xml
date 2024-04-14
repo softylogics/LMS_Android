@@ -15,11 +15,24 @@
         <item name="toolbarBackground">@color/primary</item>
     </style>
 
+    <style name="Theme.LMS.Starting" parent="Theme.SplashScreen">
+        <!-- Set the splash screen background, animated icon, and animation duration. -->
+        <item name="windowSplashScreenBackground">@color/myWindowBackground</item>
 
+        <!-- Use windowSplashScreenAnimatedIcon to add either a drawable or an
+             animated drawable. One of these is required. -->
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <!-- Required for animated icons -->
+        <item name="windowSplashScreenAnimationDuration">5000</item>
+
+        <!-- Set the theme of the Activity that directly follows your splash screen. -->
+        <!-- Required -->
+        <item name="postSplashScreenTheme">@style/BaseAppTheme</item>
+    </style>
     <!-- Toolbar Styles -->
     <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="spinBars">true</item>
-        <item name="color">?toolbarForeground</item><!-- Changed -->
+        <item name="color">@color/black</item><!-- Changed -->
     </style>
 
 </resources>

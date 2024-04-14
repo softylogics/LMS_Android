@@ -48,7 +48,7 @@
 
 <!--    <fragment-->
 <!--        android:id="@+id/navigation_video_player"-->
-<!--        android:name="com.dusre.lms.ui.VideoPlayerFragment"-->
+<!--        android:name="com.dusre.lms.VideoPlayerActivity"-->
 <!--        android:label="@string/title_sections"-->
 <!--        tools:layout="@layout/fragment_player_layout" />-->
 

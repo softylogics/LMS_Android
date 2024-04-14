@@ -49,9 +49,9 @@ public class DownloadedLessonsAdapter extends RecyclerView.Adapter<DownloadedLes
 
         holder.bind(lesson, position);
 
-        holder.binding.downloadedNestedDel.setOnClickListener(v->{
-            listener.onDownloadDeleteVideo(position);
-        });
+//        holder.binding.downloadedNestedDel.setOnClickListener(v->{
+//            listener.onDownloadDeleteVideo(position);
+//        });
         holder.binding.txtDownloadedNestedLessonTitle.setOnClickListener(v->{
             listener.onDownloadedLessonNameClick(position);
         });

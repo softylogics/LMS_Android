@@ -28,7 +28,7 @@ public class SectionsAdapter extends RecyclerView.Adapter<SectionsAdapter.Course
     private final SetOnClickListener listener;
 
     private List<Lesson> lessons;
-
+    private LessonsAdapter adapter;
 
 
     public SectionsAdapter(Context context, SectionsViewModel sectionsViewModel, SetOnClickListener listener) {
@@ -65,11 +65,11 @@ public class SectionsAdapter extends RecyclerView.Adapter<SectionsAdapter.Course
         }else{
             holder.binding.arrowImageview.setImageResource(R.drawable.baseline_keyboard_arrow_down_24);
         }
-        LessonsAdapter adapter = new LessonsAdapter(context, lessons, listener);
+        adapter = new LessonsAdapter(context, lessons, listener);
         holder.binding.childRv.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext()));
         holder.binding.childRv.setHasFixedSize(true);
         holder.binding.childRv.setAdapter(adapter);
-        holder.binding.arrowImageview.setOnClickListener(v -> {
+        holder.binding.linearLayoutCourseDetailItem.setOnClickListener(v -> {
             if(section.isExpandable()){
                 section.setIs_expandable(false);
             }
@@ -98,6 +98,10 @@ public class SectionsAdapter extends RecyclerView.Adapter<SectionsAdapter.Course
     @Override
     public int getItemCount() {
         return sectionList.size();
+    }
+
+    public void reload() {
+        adapter.notifyDataSetChanged();
     }
 
     public class CourseViewHolder extends RecyclerView.ViewHolder {
