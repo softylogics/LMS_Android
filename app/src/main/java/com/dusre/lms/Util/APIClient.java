@@ -3,6 +3,7 @@ package com.dusre.lms.Util;
 import android.content.Context;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -20,6 +21,15 @@ import java.util.Map;
 public class APIClient {
     private RequestQueue requestQueue;
     private Context context;
+    int requestTimeoutMs = 30000; // Timeout duration in milliseconds (30 seconds)
+    int maxRetries = 3; // Maximum number of retry attempts
+    float backoffMultiplier = 2.0f; // Backoff multiplier (2.0 means exponential backoff)
+
+    RetryPolicy customRetryPolicy = new DefaultRetryPolicy(
+            requestTimeoutMs,
+            maxRetries,
+            backoffMultiplier
+    );
 
     public APIClient(Context context) {
         this.context = context;
@@ -99,7 +109,7 @@ public class APIClient {
                 return headers;
             }
         };
-
+        stringRequest.setRetryPolicy(customRetryPolicy);
         // Add the request to the Volley request queue
         requestQueue.add(stringRequest);
     }

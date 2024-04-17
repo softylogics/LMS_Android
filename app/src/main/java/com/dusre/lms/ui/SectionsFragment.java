@@ -2,6 +2,8 @@ package com.dusre.lms.ui;
 
 import static android.content.Context.DOWNLOAD_SERVICE;
 
+
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.DownloadManager;
@@ -43,6 +45,9 @@ import com.dusre.lms.R;
 import com.dusre.lms.Util.APIClient;
 import com.dusre.lms.Util.Constants;
 import com.dusre.lms.Util.DatabaseHelper;
+
+import com.dusre.lms.Util.DownloadService;
+import com.dusre.lms.Util.PostDownloadService;
 import com.dusre.lms.Util.UserPreferences;
 import com.dusre.lms.VideoPlayerActivity;
 import com.dusre.lms.adapters.SectionsAdapter;
@@ -93,6 +98,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
     private NavController navController;
     private boolean updatingOnServer = false;
     private SectionsAdapter sectionsAdapter;
+//    private DownloadCompleteReceiver downloadCompleteReceiver;
 
     public SectionsFragment() {
     }
@@ -106,7 +112,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         binding = CourseDetailLayoutBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         binding.recyclerViewCourseDetail.setLayoutManager(new LinearLayoutManager(requireContext()));
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+//        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         coursesViewModel = new ViewModelProvider(requireActivity()).get(CoursesViewModel.class);
         sectionsViewModel = new ViewModelProvider(requireActivity()).get(SectionsViewModel.class);
         lessonsViewModel = new ViewModelProvider(requireActivity()).get(LessonsViewModel.class);
@@ -147,63 +153,66 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 
         dbHelper = new DatabaseHelper(getContext());
         myVolleyApiClient = new APIClient(getContext());
-        onDownloadComplete = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                //Fetching the download id received with the broadcast
-                long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-                //Checking if the received broadcast is for our enqueued download by matching download id
-                if (downloadID == id) {
-                    Log.d("download", "in if receiver");
-                    DownloadManager.Query query = new DownloadManager.Query();
-                    query.setFilterById(downloadID);
-                    Cursor cursor = downloadManager.query(query);
-                    if (cursor.moveToFirst()) {
-
-                        int statusIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
-                        int status = cursor.getInt(statusIndex);
-                        Log.d("download" , status+"");
-                        Log.d("download" , statusIndex+"");
-
-                        if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                            // Download completed successfully
-                            Log.d("download", "in if if receiver");
-                            String filePath = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-                            cursor.close();
-                            downloadedVideo.setVideo_file_path(filePath);
-                            downloadedVideo.setUpdateOnServer("0");
-                            dbHelper.addDownloadedVideo(downloadedVideo);
-                            // Handle successful download
-                            Toast.makeText(getContext(), "Download Completed. You can find it in Downloaded lectures.", Toast.LENGTH_LONG).show();
-                            hideDownloadProgressBar();
-
-                            binding.progressBarCourseDetail.setVisibility(View.VISIBLE);
-                            ((MainActivity) requireActivity()).disableBottomNav();
-                            updateLessonOnServer();
-                        } else if (status == DownloadManager.STATUS_FAILED) {
-                            // Download failed
-                            // Handle download failure
-                            hideDownloadProgressBar();
-                            Toast.makeText(getContext(), "Download Failed", Toast.LENGTH_SHORT).show();
-                        } else if (status == DownloadManager.STATUS_PAUSED) {
-                            // Download paused
-                            // Handle download pause
-                            Toast.makeText(getContext(), "Download Paused", Toast.LENGTH_SHORT).show();
-                        }
-                        // Retrieve the file path
-
-                        // Store the file path for later access (e.g., in SharedPreferences)
-                        // Here, for simplicity, we'll just use a class-level variable
-
-                    }
-                }
-                lesson_id = -1;
-                downloadID = -1;
-            }
-
-
-        };
-        requireActivity().registerReceiver(onDownloadComplete,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+//         downloadCompleteReceiver = new DownloadCompleteReceiver();
+//        onDownloadComplete = new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                //Fetching the download id received with the broadcast
+//                long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+//                //Checking if the received broadcast is for our enqueued download by matching download id
+//                if (downloadID == id) {
+//                    handleDownloadCompletion(context, downloadID);
+////                    Log.d("download", "in if receiver");
+////                    DownloadManager.Query query = new DownloadManager.Query();
+////                    query.setFilterById(downloadID);
+////
+////                    Cursor cursor = downloadManager.query(query);
+////                    if (cursor.moveToFirst()) {
+////
+////                        int statusIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
+////                        int status = cursor.getInt(statusIndex);
+////                        Log.d("download" , status+"");
+////                        Log.d("download" , statusIndex+"");
+////
+////                        if (status == DownloadManager.STATUS_SUCCESSFUL) {
+////                            // Download completed successfully
+////                            Log.d("download", "in if if receiver");
+////                            String filePath = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+////                            cursor.close();
+////                            downloadedVideo.setVideo_file_path(filePath);
+////                            downloadedVideo.setUpdateOnServer("0");
+////                            dbHelper.addDownloadedVideo(downloadedVideo);
+////                            // Handle successful download
+////                            Toast.makeText(getContext(), "Download Completed. You can find it in Downloaded lectures.", Toast.LENGTH_LONG).show();
+////                            hideDownloadProgressBar();
+////
+////                            binding.progressBarCourseDetail.setVisibility(View.VISIBLE);
+////                            ((MainActivity) requireActivity()).disableBottomNav();
+////                            updateLessonOnServer();
+////                        } else if (status == DownloadManager.STATUS_FAILED) {
+////                            // Download failed
+////                            // Handle download failure
+////                            hideDownloadProgressBar();
+////                            Toast.makeText(getContext(), "Download Failed", Toast.LENGTH_SHORT).show();
+////                        } else if (status == DownloadManager.STATUS_PAUSED) {
+////                            // Download paused
+////                            // Handle download pause
+////                            Toast.makeText(getContext(), "Download Paused", Toast.LENGTH_SHORT).show();
+////                        }
+////                        // Retrieve the file path
+////
+////                        // Store the file path for later access (e.g., in SharedPreferences)
+////                        // Here, for simplicity, we'll just use a class-level variable
+////
+////                }
+//                }
+//                lesson_id = -1;
+//                downloadID = -1;
+//            }
+//
+//
+//        };
+//        requireActivity().registerReceiver(downloadCompleteReceiver,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
         onDownloadNotoficationClicked = new BroadcastReceiver() {
             @Override
@@ -220,6 +229,16 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 
 
         return root;
+    }
+
+    private void handleDownloadCompletion(Context context, long downloadID) {
+        // Perform actions after download completes (e.g., process the downloaded file)
+        // You can start a service or perform any necessary background processing here
+        // For example, launch a service to handle post-download tasks
+        Intent serviceIntent = new Intent(context, PostDownloadService.class);
+        serviceIntent.putExtra("downloadId", downloadID);
+        serviceIntent.putExtra("lesson_id", lesson_id);
+        context.startService(serviceIntent);
     }
 
     private void updateLessonOnServer() {
@@ -240,7 +259,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
             @Override
             public void onFailure(VolleyError error) {
                 //todo: handle video deletion/updating the server whenever possible if not successful in first go
-                //todo: what if the user changes the section id and lesson id during the download
+
                 binding.progressBarCourseDetail.setVisibility(View.GONE);
 
                 Log.d("API Response", error.toString());
@@ -320,7 +339,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-        getActivity().unregisterReceiver(onDownloadComplete);
+//        getActivity().unregisterReceiver(downloadCompleteReceiver);
     }
 
     @Override
@@ -335,7 +354,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 
     @Override
     public void onCheckBoxClick(int position) {
-        //todo: complete this checkbox functionality
+
     }
 
     @Override
@@ -344,21 +363,25 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         lessonsViewModel.setMyLessons(sectionsViewModel.getSections().getValue().get(Constants.current_section_id).getLessons());
         if(hasPermissionToDownload(getActivity())){
             if(checkInternet()!=0) {
-                String videoId = UUID.randomUUID().toString();
+//                String videoId = UUID.randomUUID().toString();
 
                 Lesson lesson = lessonsViewModel.getMyLessons().getValue().get(position);
-                downloadedVideo = new DownloadedVideo();
-                downloadedVideo.setId(videoId);
-                downloadedVideo.setTitle(lesson.getTitle());
-                downloadedVideo.setDuration(lesson.getDuration());
-                downloadedVideo.setCourse_id(lesson.getCourse_id());
-                downloadedVideo.setCourse_title(getCourseTitle(lesson.getCourse_id()));
-                downloadedVideo.setSection_id(lesson.getSection_id());
-                downloadedVideo.setSection_title(getSectionTitle(lesson.getSection_id()));
-                downloadedVideo.setUpdateOnServer("0");
-
+//                downloadedVideo = new DownloadedVideo();
+//                downloadedVideo.setId(videoId);
+//                downloadedVideo.setTitle(lesson.getTitle());
+//                downloadedVideo.setDuration(lesson.getDuration());
+//                downloadedVideo.setCourse_id(lesson.getCourse_id());
+//                downloadedVideo.setCourse_title(getCourseTitle(lesson.getCourse_id()));
+//                downloadedVideo.setSection_id(lesson.getSection_id());
+//                downloadedVideo.setSection_title(getSectionTitle(lesson.getSection_id()));
+//                downloadedVideo.setUpdateOnServer("0");
                 lesson_id = Integer.parseInt(lesson.getId());
-                beginDownload(lesson.getVideo_url_web());
+                UserPreferences.setInt(Constants.lesson_id_for_post_download_service, lesson_id);
+                UserPreferences.setString(Constants.course_id_for_post_download_service, lesson.getCourse_id());
+                Intent serviceIntent = new Intent(getContext(), DownloadService.class);
+                serviceIntent.putExtra("url", lesson.getVideo_url_web());
+                requireActivity().startService(serviceIntent);
+//                beginDownload(lesson.getVideo_url_web());
 
             }
             else{
@@ -370,45 +393,45 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 
 private void beginDownload(String url){
     if (downloadID == -1) {
-        showDownloadProgressBar();
-        Toast.makeText(getContext(), "Download started..." , Toast.LENGTH_LONG).show();
+//        showDownloadProgressBar();
         String fileName = url.substring(url.lastIndexOf('/') + 1);
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url))
 
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)// Visibility of the download Notification
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)// Visibility of the download Notification
                 .setDestinationInExternalFilesDir(getContext(), getActivity().getFilesDir().getAbsolutePath(), fileName)
-//                .setTitle(fileName)// Title of the Download Notification
-//                .setDescription("Downloading")// Description of the Download Notification
+                .setTitle(fileName)// Title of the Download Notification
+                .setDescription("Downloading")// Description of the Download Notification
                 .setAllowedOverMetered(true)// Set if download is allowed on Mobile network
                 .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE | DownloadManager.Request.NETWORK_WIFI)
                 .setAllowedOverRoaming(true);// Set if download is allowed on roaming network
 
         downloadManager = (DownloadManager) getActivity().getSystemService(DOWNLOAD_SERVICE);
         downloadID = downloadManager.enqueue(request);// enqueue puts the download request in the queue.
+        Toast.makeText(getContext(), "Download started..." , Toast.LENGTH_LONG).show();
 
-        final Handler handler = new Handler();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                Cursor cursor = downloadManager.query(new DownloadManager.Query().setFilterById(downloadID));
-                if (cursor.moveToFirst()) {
-                    int bytesDownloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-                    int bytesTotal = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-                    int progress = (int) ((bytesDownloaded * 100L) / bytesTotal);
-
-
-                    // Update your custom progress dialog with the progress value
-                    updateProgressDialog(progress);
-
-                    if (progress < 100) {
-                        handler.postDelayed(this, 1000); // Poll every second
-                    }
-                }
-                cursor.close();
-            }
-        };
-        handler.post(runnable);
+//        final Handler handler = new Handler();
+//        Runnable runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                Cursor cursor = downloadManager.query(new DownloadManager.Query().setFilterById(downloadID));
+//                if (cursor.moveToFirst()) {
+//                    int bytesDownloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+//                    int bytesTotal = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+//                    int progress = (int) ((bytesDownloaded * 100L) / bytesTotal);
+//
+//
+//                    // Update your custom progress dialog with the progress value
+//                    updateProgressDialog(progress);
+//
+//                    if (progress < 100) {
+//                        handler.postDelayed(this, 1000); // Poll every second
+//                    }
+//                }
+//                cursor.close();
+//            }
+//        };
+//        handler.post(runnable);
     }
     else{
         Toast.makeText(getContext(), "Already Downloading", Toast.LENGTH_SHORT).show();
@@ -728,7 +751,7 @@ private void beginDownload(String url){
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
-                if (fetching || downloadID!=-1) {
+                if (fetching) {
                     Toast.makeText(getContext(), "Please wait for the process to complete." , Toast.LENGTH_SHORT).show();
                 } else {
                     navController.navigateUp();

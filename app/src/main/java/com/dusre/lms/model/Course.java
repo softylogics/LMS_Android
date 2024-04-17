@@ -42,6 +42,8 @@ public class Course{
     public String instructor_image;
     public int total_enrollment;
     public String shareable_link;
+
+
     public int completion;
     public int total_number_of_lessons;
     public int total_number_of_completed_lessons;

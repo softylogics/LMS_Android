@@ -40,7 +40,7 @@ public class DownloadedSectionsFragment extends Fragment implements SetOnClickLi
 
     private DatabaseHelper dbHelper;
 
-//todo: downloaded lectures not categorized properly
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 

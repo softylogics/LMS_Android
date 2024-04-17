@@ -24,6 +24,7 @@ import com.dusre.lms.MainActivity;
 import com.dusre.lms.R;
 import com.dusre.lms.Util.APIClient;
 import com.dusre.lms.Util.Constants;
+import com.dusre.lms.Util.UpdateApp;
 import com.dusre.lms.Util.UserPreferences;
 import com.dusre.lms.adapters.MyCoursesAdapter;
 import com.dusre.lms.databinding.FragmentMyCourseBinding;
@@ -49,7 +50,7 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
 
     private boolean isFragmentAttached = false;
     private APIClient myVolleyApiClient;
-
+    private UpdateApp updateApp;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -78,7 +79,8 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
         binding.recyclerViewMyCourses.setAdapter(courseAdapter);
         gson = new Gson();
 
-
+        updateApp = new UpdateApp(getContext(), getActivity());
+        updateApp.updateApp();
         binding.swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -276,5 +278,13 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
         params.put("auth_token", UserPreferences.getString(Constants.TOKEN));
 
         myVolleyApiClient.fetchDataFromApi(Constants.url+"downloaded_lesson_reset", params, listener , Constants.MY_COURSE_FRAGMENT);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (updateApp != null) {
+            updateApp.resumeUpdate();
+        }
     }
 }
