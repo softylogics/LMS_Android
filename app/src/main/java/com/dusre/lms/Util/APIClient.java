@@ -21,8 +21,8 @@ import java.util.Map;
 public class APIClient {
     private RequestQueue requestQueue;
     private Context context;
-    int requestTimeoutMs = 30000; // Timeout duration in milliseconds (30 seconds)
-    int maxRetries = 3; // Maximum number of retry attempts
+    int requestTimeoutMs = 10000; // Timeout duration in milliseconds (30 seconds)
+    int maxRetries = 1; // Maximum number of retry attempts
     float backoffMultiplier = 2.0f; // Backoff multiplier (2.0 means exponential backoff)
 
     RetryPolicy customRetryPolicy = new DefaultRetryPolicy(
@@ -62,12 +62,12 @@ public class APIClient {
         stringRequest.setRetryPolicy(new RetryPolicy() {
             @Override
             public int getCurrentTimeout() {
-                return 50000;
+                return 10000;
             }
 
             @Override
             public int getCurrentRetryCount() {
-                return 50000;
+                return 1;
             }
 
             @Override
@@ -152,6 +152,22 @@ public class APIClient {
             }
 
 
+        });
+        stringRequest.setRetryPolicy(new RetryPolicy() {
+            @Override
+            public int getCurrentTimeout() {
+                return 10000;
+            }
+
+            @Override
+            public int getCurrentRetryCount() {
+                return 0;
+            }
+
+            @Override
+            public void retry(VolleyError error) throws VolleyError {
+
+            }
         });
 
         requestQueue.add(stringRequest);

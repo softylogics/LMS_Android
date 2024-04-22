@@ -136,7 +136,17 @@
             android:keepScreenOn="true"
             app:controller_layout_id="@layout/custom_playback_view"
             app:use_controller="true"
+            android:visibility="gone"
             />
+
+    <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+        android:id="@+id/youtube_playerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:enableAutomaticInitialization="true"
+        app:handleNetworkEvents="true"
+
+        />
 
 
 

@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +28,15 @@ import com.dusre.lms.viewmodel.CoursesViewModel;
 import com.dusre.lms.viewmodel.DownloadedVideoViewModel;
 import com.dusre.lms.viewmodel.LessonsViewModel;
 import com.dusre.lms.viewmodel.SectionsViewModel;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.customui.DefaultPlayerUiController;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.customui.PlayerUiController;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFramePlayerOptions;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class VideoPlayerActivity extends AppCompatActivity implements SetOnClickListener {
 
@@ -457,6 +467,10 @@ public class VideoPlayerActivity extends AppCompatActivity implements SetOnClick
             player.release();
         }
         if(Constants.isDownloadVideoPlay){
+            binding.youtubePlayerView.setVisibility(View.GONE);
+            binding.playerView.setVisibility(View.VISIBLE);
+            binding.topController.setVisibility(View.VISIBLE);
+
             player = new ExoPlayer.Builder(this).build();
             // Bind the player to the view.
             binding.playerView.setPlayer(player);
@@ -490,27 +504,74 @@ public class VideoPlayerActivity extends AppCompatActivity implements SetOnClick
             }
         }
         else {
-            player = new ExoPlayer.Builder(this).build();
-            // Bind the player to the view.
-            binding.playerView.setPlayer(player);
-            // Build the media item.
-            MediaItem mediaItem = MediaItem.fromUri(Constants.lessons.get(Constants.current_lesson_id).getVideo_url_web());
-// Set the media item to be played.
-            player.setMediaItem(mediaItem);
-            player.setPlayWhenReady(playWhenReady);
-            setRepeatMode(player);
-            setFullscreenMode(player);
 
-// Prepare the player.
-            player.prepare();
-            binding.videoTitle.setText(Constants.lessons.get(Constants.current_lesson_id).getTitle());
-// Start the playback.
-            if (playWhenReady) {
-                playVideo();
-            } else {
-                pauseVideo();
+            if(Constants.lessons.get(Constants.current_lesson_id).getVideo_url_web().contains("youtube")){
+                binding.youtubePlayerView.setVisibility(View.VISIBLE);
+                binding.playerView.setVisibility(View.GONE);
+                binding.topController.setVisibility(View.GONE);
+                getLifecycle().addObserver(binding.youtubePlayerView);
+                YouTubePlayerListener listener = new AbstractYouTubePlayerListener() {
+                    @Override
+                    public void onReady(@NonNull YouTubePlayer youTubePlayer) {
+                        DefaultPlayerUiController defaultPlayerUiController = new DefaultPlayerUiController(binding.youtubePlayerView, youTubePlayer);
+                        defaultPlayerUiController.showMenuButton(false);
+                        defaultPlayerUiController.showYouTubeButton(false);
+                        binding.youtubePlayerView.setCustomPlayerUi(defaultPlayerUiController.getRootView());
+                        youTubePlayer.loadVideo(extractVideoID(), 0);
+                    }
+
+                };
+
+                IFramePlayerOptions options = new IFramePlayerOptions.Builder().controls(0).build();
+                binding.youtubePlayerView.initialize(listener, options);
+
+            }
+            else{
+                binding.youtubePlayerView.setVisibility(View.GONE);
+                binding.playerView.setVisibility(View.VISIBLE);
+                binding.topController.setVisibility(View.VISIBLE);
+                player = new ExoPlayer.Builder(this).build();
+                // Bind the player to the view.
+                binding.playerView.setPlayer(player);
+                // Build the media item.
+                MediaItem mediaItem = MediaItem.fromUri(Constants.lessons.get(Constants.current_lesson_id).getVideo_url_web());
+    // Set the media item to be played.
+                player.setMediaItem(mediaItem);
+                player.setPlayWhenReady(playWhenReady);
+                setRepeatMode(player);
+                setFullscreenMode(player);
+
+    // Prepare the player.
+                player.prepare();
+                binding.videoTitle.setText(Constants.lessons.get(Constants.current_lesson_id).getTitle());
+    // Start the playback.
+                if (playWhenReady) {
+                    playVideo();
+                } else {
+                    pauseVideo();
+                }
             }
         }
+    }
+
+    private String extractVideoID() {
+        String videoId = null;
+        String pattern = "(?<=watch\\?v=|/videos/|embed\\/|youtu.be\\/|\\/v\\/|\\/e\\/|watch\\?v%3D|watch\\?feature=player_embedded&v=|%2Fvideos%2F|embed%2F)[^#\\&\\?\\n]*";
+
+        try {
+            Pattern compiledPattern = Pattern.compile(pattern);
+            Matcher matcher = compiledPattern.matcher(Constants.lessons.get(Constants.current_lesson_id).getVideo_url_web());
+
+            if (matcher.find()) {
+                videoId = matcher.group();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return videoId;
+
+
     }
 
     @Override

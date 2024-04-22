@@ -365,7 +365,6 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
             if(checkInternet()!=0) {
 //                String videoId = UUID.randomUUID().toString();
 
-                Lesson lesson = lessonsViewModel.getMyLessons().getValue().get(position);
 //                downloadedVideo = new DownloadedVideo();
 //                downloadedVideo.setId(videoId);
 //                downloadedVideo.setTitle(lesson.getTitle());
@@ -375,12 +374,18 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 //                downloadedVideo.setSection_id(lesson.getSection_id());
 //                downloadedVideo.setSection_title(getSectionTitle(lesson.getSection_id()));
 //                downloadedVideo.setUpdateOnServer("0");
-                lesson_id = Integer.parseInt(lesson.getId());
-                UserPreferences.setInt(Constants.lesson_id_for_post_download_service, lesson_id);
-                UserPreferences.setString(Constants.course_id_for_post_download_service, lesson.getCourse_id());
-                Intent serviceIntent = new Intent(getContext(), DownloadService.class);
-                serviceIntent.putExtra("url", lesson.getVideo_url_web());
-                requireActivity().startService(serviceIntent);
+                if(UserPreferences.getint(Constants.lesson_id_for_post_download_service)!=-1) {
+                    Lesson lesson = lessonsViewModel.getMyLessons().getValue().get(position);
+                    lesson_id = Integer.parseInt(lesson.getId());
+                    UserPreferences.setInt(Constants.lesson_id_for_post_download_service, lesson_id);
+                    UserPreferences.setString(Constants.course_id_for_post_download_service, lesson.getCourse_id());
+                    Intent serviceIntent = new Intent(getContext(), DownloadService.class);
+                    serviceIntent.putExtra("url", lesson.getVideo_url_web());
+                    requireActivity().startService(serviceIntent);
+                }
+                else{
+                    Toast.makeText(getContext(), "Already Downloading", Toast.LENGTH_SHORT).show();
+                }
 //                beginDownload(lesson.getVideo_url_web());
 
             }

@@ -121,37 +121,17 @@ public class DownloadService extends Service {
                         }
                     }
                 }
-
-                String videoId = UUID.randomUUID().toString();
-                DownloadedVideo downloadedVideo = new DownloadedVideo();
-
-                downloadedVideo.setId(videoId);
-                downloadedVideo.setTitle(requiredLesson.getTitle());
-                downloadedVideo.setDuration(requiredLesson.getDuration());
-                downloadedVideo.setCourse_id(requiredLesson.getCourse_id());
-                downloadedVideo.setCourse_title(courseTitle);
-                downloadedVideo.setSection_id(requiredLesson.getSection_id());
-                downloadedVideo.setSection_title(sectionTitle);
-                downloadedVideo.setUpdateOnServer("0");
-
-                downloadedVideo.setVideo_file_path(filePath);
-                downloadedVideo.setUpdateOnServer("0");
-
-                DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
-                dbHelper.addDownloadedVideo(downloadedVideo);
-                // Handle successful download
-
-                updateLessonOnServer(UserPreferences.getint(Constants.lesson_id_for_post_download_service));
+                updateLessonOnServer(UserPreferences.getint(Constants.lesson_id_for_post_download_service), filePath);
                 Log.d("API Response", response);
-
-
             }
 
             @Override
             public void onFailure(VolleyError error) {
                 // Handle failure
 //                if(isFragmentAttached) {
-
+                UserPreferences.setInt(Constants.lesson_id_for_post_download_service, -1);
+                UserPreferences.setString(Constants.course_id_for_post_download_service, null);
+                Toast.makeText(getApplicationContext(), "An error occurred downloading the lecture", Toast.LENGTH_LONG).show();
                 Log.d("API Response", error.toString());
 
 //                }
@@ -173,12 +153,31 @@ public class DownloadService extends Service {
 
     }
 
-    private void updateLessonOnServer(int lesson_id) {
+    private void updateLessonOnServer(int lesson_id, String filePath) {
 
         APIClient.ApiResponseListener listener = new APIClient.ApiResponseListener() {
             @Override
             public void onSuccess(String response) {
+                String videoId = UUID.randomUUID().toString();
+                DownloadedVideo downloadedVideo = new DownloadedVideo();
 
+                downloadedVideo.setId(videoId);
+                downloadedVideo.setTitle(requiredLesson.getTitle());
+                downloadedVideo.setDuration(requiredLesson.getDuration());
+                downloadedVideo.setCourse_id(requiredLesson.getCourse_id());
+                downloadedVideo.setCourse_title(courseTitle);
+                downloadedVideo.setSection_id(requiredLesson.getSection_id());
+                downloadedVideo.setSection_title(sectionTitle);
+                downloadedVideo.setUpdateOnServer("0");
+
+                downloadedVideo.setVideo_file_path(filePath);
+                downloadedVideo.setUpdateOnServer("0");
+
+                DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
+                dbHelper.addDownloadedVideo(downloadedVideo);
+
+                UserPreferences.setInt(Constants.lesson_id_for_post_download_service, -1);
+                UserPreferences.setString(Constants.course_id_for_post_download_service, null);
 
                 //sectionsAdapter.reload();
                 Log.d("API Response", response);
@@ -189,7 +188,7 @@ public class DownloadService extends Service {
             @Override
             public void onFailure(VolleyError error) {
 
-
+                Toast.makeText(getApplicationContext(), "An error occurred downloading the lecture", Toast.LENGTH_LONG).show();
                 Log.d("API Response", error.toString());
 
 
@@ -264,7 +263,7 @@ public class DownloadService extends Service {
 //        handler.post(runnable);
         }
         else{
-            Toast.makeText(this, "Already Downloading", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Already Downloading, in download service", Toast.LENGTH_SHORT).show();
         }
         // Save the download ID to track the download
     }
