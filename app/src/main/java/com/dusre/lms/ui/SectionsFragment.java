@@ -361,7 +361,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
     public void onDownloadButtonClick(int position) {
 
         lessonsViewModel.setMyLessons(sectionsViewModel.getSections().getValue().get(Constants.current_section_id).getLessons());
-        if(hasPermissionToDownload(getActivity())){
+//        if(hasPermissionToDownload(getActivity())){
             if(checkInternet()!=0) {
 //                String videoId = UUID.randomUUID().toString();
 
@@ -374,7 +374,8 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 //                downloadedVideo.setSection_id(lesson.getSection_id());
 //                downloadedVideo.setSection_title(getSectionTitle(lesson.getSection_id()));
 //                downloadedVideo.setUpdateOnServer("0");
-                if(UserPreferences.getint(Constants.lesson_id_for_post_download_service)!=-1) {
+                if(!Constants.downloading) {
+                    Constants.downloading = true;
                     Lesson lesson = lessonsViewModel.getMyLessons().getValue().get(position);
                     lesson_id = Integer.parseInt(lesson.getId());
                     UserPreferences.setInt(Constants.lesson_id_for_post_download_service, lesson_id);
@@ -392,7 +393,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
             else{
                 Toast.makeText(getContext(), "No Internet Connection", Toast.LENGTH_SHORT).show();
             }
-        }
+//        }
     }
 
 
@@ -404,7 +405,7 @@ private void beginDownload(String url){
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url))
 
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)// Visibility of the download Notification
-                .setDestinationInExternalFilesDir(getContext(), getActivity().getFilesDir().getAbsolutePath(), fileName)
+                .setDestinationInExternalFilesDir(getContext(),null, fileName)
                 .setTitle(fileName)// Title of the Download Notification
                 .setDescription("Downloading")// Description of the Download Notification
                 .setAllowedOverMetered(true)// Set if download is allowed on Mobile network

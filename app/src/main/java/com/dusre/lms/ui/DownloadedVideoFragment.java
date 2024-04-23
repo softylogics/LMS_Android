@@ -29,6 +29,7 @@ import com.dusre.lms.model.DownloadedVideo;
 import com.dusre.lms.viewmodel.DownloadedVideoViewModel;
 import com.google.gson.Gson;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -105,7 +106,11 @@ public class DownloadedVideoFragment extends Fragment implements SetOnClickListe
                 lesson.setLessonTitle(video.getTitle());
                 lesson.setDuration(video.getDuration());
                 lesson.setVideoPath(video.getVideo_file_path());
-                section.getDownloadedLessons().add(lesson);
+                File file = new File(video.getVideo_file_path());
+                if(file.exists()) {
+                    section.getDownloadedLessons().add(lesson);
+                }
+
             }
 
             // Map to store courses by their IDs
@@ -119,6 +124,7 @@ public class DownloadedVideoFragment extends Fragment implements SetOnClickListe
                     course.setCourseID(video.getCourse_id());
                     course.setCourseTitle(video.getCourse_title());
                     course.setDownloadedSections(new ArrayList<>());
+
                     courseMap.put(video.getCourse_id(), course);
                 }
 
@@ -127,7 +133,9 @@ public class DownloadedVideoFragment extends Fragment implements SetOnClickListe
 
                 // Check if the section is already added to the course
                 if (!course.getDownloadedSections().contains(section)) {
-                    course.getDownloadedSections().add(section);
+                    if(!section.getDownloadedLessons().isEmpty()) {
+                        course.getDownloadedSections().add(section);
+                    }
                 }
             }
 

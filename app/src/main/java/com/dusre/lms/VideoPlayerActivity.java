@@ -1,8 +1,10 @@
 package com.dusre.lms;
 
 import android.content.pm.ActivityInfo;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -30,6 +32,7 @@ import com.dusre.lms.viewmodel.LessonsViewModel;
 import com.dusre.lms.viewmodel.SectionsViewModel;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.customui.DefaultPlayerUiController;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.customui.PlayerUiController;
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener;
@@ -477,6 +480,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements SetOnClick
             // Build the media item.
             String folderName = "DownloadedVideos";
             String path = Constants.downloadedLessons.get(Constants.current_downloaded_lesson_id).getVideoPath();
+            Log.d("downloadPlayer" , path);
             String name = path.substring(path.lastIndexOf("/")+1);
             //            File file = new File(getActivity().getFilesDir(), name);
 //            File directory = getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
@@ -514,7 +518,117 @@ public class VideoPlayerActivity extends AppCompatActivity implements SetOnClick
                     @Override
                     public void onReady(@NonNull YouTubePlayer youTubePlayer) {
                         DefaultPlayerUiController defaultPlayerUiController = new DefaultPlayerUiController(binding.youtubePlayerView, youTubePlayer);
-                        defaultPlayerUiController.showMenuButton(false);
+                        defaultPlayerUiController.showVideoTitle(true);
+                        defaultPlayerUiController.showMenuButton(true);
+                        defaultPlayerUiController.setMenuButtonClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                PopupMenu popupMenu = new PopupMenu(getApplicationContext(), view);
+                                popupMenu.getMenuInflater().inflate(R.menu.speed_menu, popupMenu.getMenu());
+                                popupMenu.setOnMenuItemClickListener(item -> {
+                                    int itemId = item.getItemId();
+                                    if (itemId == R.id.speed_0_25x) {
+                                        youTubePlayer.setPlaybackRate(PlayerConstants.PlaybackRate.RATE_0_25);
+                                        return true;
+                                    } else if (itemId == R.id.speed_0_5x) {
+                                        youTubePlayer.setPlaybackRate(PlayerConstants.PlaybackRate.RATE_0_5);
+                                        return true;
+                                    } else if (itemId == R.id.speed_normal) {
+                                        youTubePlayer.setPlaybackRate(PlayerConstants.PlaybackRate.RATE_1);
+                                        return true;
+                                    } else if (itemId == R.id.speed_1_5x) {
+                                        youTubePlayer.setPlaybackRate(PlayerConstants.PlaybackRate.RATE_1_5);
+                                        return true;
+                                    } else if (itemId == R.id.speed_2x) {
+                                        youTubePlayer.setPlaybackRate(PlayerConstants.PlaybackRate.RATE_2);
+                                        return true;
+                                    }
+                                    return false;
+                                });
+                                    popupMenu.show();
+
+                            }
+                        });
+
+//                        defaultPlayerUiController.showCustomAction1(true);
+//                        Drawable icon = getDrawable(R.drawable.playback_speed);
+//                        icon.setTint(getResources().getColor(R.color.myWindowBackground));
+//                        float dpScale = getResources().getDisplayMetrics().density;
+//                        int iconSizePx = (int) (16 * dpScale + 0.5f); // Convert dp to pixels
+//
+//                        // Set the bounds (width and height) of the drawable
+//                        icon.setBounds(0, 0, iconSizePx, iconSizePx);
+//                        defaultPlayerUiController.setCustomAction1(icon, new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View view) {
+//                                PopupMenu popupMenu = new PopupMenu(getApplicationContext(), view);
+//                                popupMenu.getMenuInflater().inflate(R.menu.speed_menu, popupMenu.getMenu());
+//                                popupMenu.setOnMenuItemClickListener(item -> {
+//                                    int itemId = item.getItemId();
+//                                    if (itemId == R.id.speed_0_25x) {
+//                                        youTubePlayer.setPlaybackRate(PlayerConstants.PlaybackRate.RATE_0_25);
+//                                        return true;
+//                                    } else if (itemId == R.id.speed_0_5x) {
+//                                        youTubePlayer.setPlaybackRate(PlayerConstants.PlaybackRate.RATE_0_5);
+//                                        return true;
+//                                    } else if (itemId == R.id.speed_normal) {
+//                                        youTubePlayer.setPlaybackRate(PlayerConstants.PlaybackRate.RATE_1);
+//                                        return true;
+//                                    } else if (itemId == R.id.speed_1_5x) {
+//                                        youTubePlayer.setPlaybackRate(PlayerConstants.PlaybackRate.RATE_1_5);
+//                                        return true;
+//                                    } else if (itemId == R.id.speed_2x) {
+//                                        youTubePlayer.setPlaybackRate(PlayerConstants.PlaybackRate.RATE_2);
+//                                        return true;
+//                                    }
+//                                    return false;
+//                                });
+//                                popupMenu.show();
+//                            }
+//                        });
+                        defaultPlayerUiController.setFullscreenButtonClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                                if(isFullscreen) {
+
+
+                                    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+
+                                    if(getSupportActionBar() != null){
+                                        getSupportActionBar().show();
+                                    }
+
+                                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+                                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) binding.youtubePlayerView.getLayoutParams();
+                                    params.width = params.MATCH_PARENT;
+                                    params.height = (int) ( 200 * getApplicationContext().getResources().getDisplayMetrics().density);
+                                    binding.youtubePlayerView.setLayoutParams(params);
+
+                                    isFullscreen = false;
+                                }else{
+
+
+                                    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN
+                                            |View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                                            |View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+
+                                    if(getSupportActionBar() != null){
+                                        getSupportActionBar().hide();
+                                    }
+
+                                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+                                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) binding.youtubePlayerView.getLayoutParams();
+                                    params.width = params.MATCH_PARENT;
+                                    params.height = params.MATCH_PARENT;
+                                    binding.youtubePlayerView.setLayoutParams(params);
+
+                                    isFullscreen = true;
+                                }
+                            }
+                        });
                         defaultPlayerUiController.showYouTubeButton(false);
                         binding.youtubePlayerView.setCustomPlayerUi(defaultPlayerUiController.getRootView());
                         youTubePlayer.loadVideo(extractVideoID(), 0);

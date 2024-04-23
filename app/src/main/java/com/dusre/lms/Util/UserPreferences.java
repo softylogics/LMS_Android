@@ -48,7 +48,7 @@ import androidx.preference.PreferenceManager;
          editor.apply();
      }
      public static int getint(String key){
-         return prefs.getInt(key, 0);
+         return prefs.getInt(key, -1);
      }
 
      public static Uri getStorageUri() {

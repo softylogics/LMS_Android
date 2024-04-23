@@ -62,6 +62,8 @@ public class DownloadService extends Service {
                         // Download completed successfully
                         Log.d("download", "successful");
                         String filePath = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+
+
                         cursor.close();
                         callCourse(filePath);
 
@@ -70,6 +72,13 @@ public class DownloadService extends Service {
                         // Handle download failure
                         Log.d("post Download" , "failed");
                         Toast.makeText(getApplicationContext(), "Download Failed", Toast.LENGTH_SHORT).show();
+                        UserPreferences.setInt(Constants.lesson_id_for_post_download_service, -1);
+                        UserPreferences.setString(Constants.course_id_for_post_download_service, null);
+                        Constants.downloading = false;
+
+
+
+                        stopSelf();
                     } else if (status == DownloadManager.STATUS_PAUSED) {
                         // Download paused
                         Log.d("post Download" , "paused");
@@ -169,26 +178,30 @@ public class DownloadService extends Service {
                 downloadedVideo.setSection_id(requiredLesson.getSection_id());
                 downloadedVideo.setSection_title(sectionTitle);
                 downloadedVideo.setUpdateOnServer("0");
-
+                Log.d("downloadUpdateLesson" , filePath);
                 downloadedVideo.setVideo_file_path(filePath);
                 downloadedVideo.setUpdateOnServer("0");
 
                 DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
                 dbHelper.addDownloadedVideo(downloadedVideo);
-
+                Toast.makeText(getApplicationContext(), "Download Successful, you can find it in Downloaded lectures.", Toast.LENGTH_LONG).show();
                 UserPreferences.setInt(Constants.lesson_id_for_post_download_service, -1);
                 UserPreferences.setString(Constants.course_id_for_post_download_service, null);
-
+                Constants.downloading = false;
                 //sectionsAdapter.reload();
                 Log.d("API Response", response);
                 //todo: develop a mechanism to tell the app that server db is uodated
-
+                stopSelf();
             }
 
             @Override
             public void onFailure(VolleyError error) {
-
+                UserPreferences.setInt(Constants.lesson_id_for_post_download_service, -1);
+                UserPreferences.setString(Constants.course_id_for_post_download_service, null);
+                Constants.downloading = false;
                 Toast.makeText(getApplicationContext(), "An error occurred downloading the lecture", Toast.LENGTH_LONG).show();
+                downloadManager.remove(downloadID);
+                stopSelf();
                 Log.d("API Response", error.toString());
 
 
@@ -221,14 +234,14 @@ public class DownloadService extends Service {
 
     private void startDownload(String url) {
         Log.d("post download", "download start" );
-        if (downloadID == -1) {
+        Log.d("download" , url);
 //        showDownloadProgressBar();
             String fileName = url.substring(url.lastIndexOf('/') + 1);
-
+        Log.d("downloadStartDownload" , getApplicationContext().getFilesDir().getAbsolutePath()+fileName);
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url))
 
                     .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)// Visibility of the download Notification
-                    .setDestinationInExternalFilesDir(this, this.getFilesDir().getAbsolutePath(), fileName)
+                    .setDestinationInExternalFilesDir(getApplicationContext(), getApplicationContext().getFilesDir().getAbsolutePath(), fileName)
                     .setTitle(fileName)// Title of the Download Notification
                     .setDescription("Downloading")// Description of the Download Notification
                     .setAllowedOverMetered(true)// Set if download is allowed on Mobile network
@@ -237,7 +250,7 @@ public class DownloadService extends Service {
 
             downloadManager = (DownloadManager) this.getSystemService(DOWNLOAD_SERVICE);
             downloadID = downloadManager.enqueue(request);// enqueue puts the download request in the queue.
-            Toast.makeText(this, "Download started..." , Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Download will start soon" , Toast.LENGTH_LONG).show();
 
 //        final Handler handler = new Handler();
 //        Runnable runnable = new Runnable() {
@@ -261,10 +274,7 @@ public class DownloadService extends Service {
 //            }
 //        };
 //        handler.post(runnable);
-        }
-        else{
-            Toast.makeText(this, "Already Downloading, in download service", Toast.LENGTH_SHORT).show();
-        }
+
         // Save the download ID to track the download
     }
 
@@ -273,7 +283,7 @@ public class DownloadService extends Service {
     @Override
     public void onDestroy() {
         Log.d("post download", "service destroyed");
-        downloadManager.remove(downloadID);
+        //downloadManager.remove(downloadID);
         // Unregister the receiver when the service is destroyed
         unregisterReceiver(downloadReceiver);
         super.onDestroy();
