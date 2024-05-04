@@ -137,7 +137,7 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
 //                if(isFragmentAttached) {
                     binding.progressBar.setVisibility(View.GONE);
                     Log.d("API Response", error.toString());
-                    Toast.makeText(getContext(),"Unale to fetch courses, please check internet connection", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(),"Unable to fetch courses, please check internet connection", Toast.LENGTH_LONG).show();
                 ((MainActivity) requireActivity()).enableBottomNav();
 //                }
             }

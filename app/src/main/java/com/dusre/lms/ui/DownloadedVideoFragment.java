@@ -1,6 +1,7 @@
 package com.dusre.lms.ui;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -106,7 +107,9 @@ public class DownloadedVideoFragment extends Fragment implements SetOnClickListe
                 lesson.setLessonTitle(video.getTitle());
                 lesson.setDuration(video.getDuration());
                 lesson.setVideoPath(video.getVideo_file_path());
-                File file = new File(video.getVideo_file_path());
+                String filePath = video.getVideo_file_path();
+                String validFilePath = filePath.replaceFirst("file://", "");
+                File file = new File(validFilePath);
                 if(file.exists()) {
                     section.getDownloadedLessons().add(lesson);
                 }

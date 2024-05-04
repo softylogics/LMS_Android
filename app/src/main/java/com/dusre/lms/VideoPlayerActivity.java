@@ -1,5 +1,7 @@
 package com.dusre.lms;
 
+import static androidx.media3.common.MediaLibraryInfo.TAG;
+
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -8,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,11 +19,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.PlaybackException;
 import androidx.media3.common.PlaybackParameters;
 import androidx.media3.common.Player;
 import androidx.media3.common.util.UnstableApi;
+import androidx.media3.exoplayer.ExoPlaybackException;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.ui.AspectRatioFrameLayout;
+
 import androidx.media3.ui.PlayerControlView;
 
 import com.dusre.lms.Util.Constants;
@@ -475,6 +481,12 @@ public class VideoPlayerActivity extends AppCompatActivity implements SetOnClick
             binding.topController.setVisibility(View.VISIBLE);
 
             player = new ExoPlayer.Builder(this).build();
+            player.addListener(new Player.Listener() {
+                @Override
+                public void onPlayerError(PlaybackException error) {
+                    Toast.makeText(getApplicationContext(), "Cannot play media due to " + error.toString(), Toast.LENGTH_LONG).show();
+                }
+            });
             // Bind the player to the view.
             binding.playerView.setPlayer(player);
             // Build the media item.
@@ -645,6 +657,12 @@ public class VideoPlayerActivity extends AppCompatActivity implements SetOnClick
                 binding.playerView.setVisibility(View.VISIBLE);
                 binding.topController.setVisibility(View.VISIBLE);
                 player = new ExoPlayer.Builder(this).build();
+                player.addListener(new Player.Listener() {
+                    @Override
+                    public void onPlayerError(PlaybackException error) {
+                        Toast.makeText(getApplicationContext(), "Cannot play media due to " + error.toString(), Toast.LENGTH_LONG).show();
+                    }
+                });
                 // Bind the player to the view.
                 binding.playerView.setPlayer(player);
                 // Build the media item.

@@ -13,6 +13,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import android.net.Uri;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -59,22 +60,7 @@ public class APIClient {
 
         });
         stringRequest.setTag(tag);
-        stringRequest.setRetryPolicy(new RetryPolicy() {
-            @Override
-            public int getCurrentTimeout() {
-                return 10000;
-            }
-
-            @Override
-            public int getCurrentRetryCount() {
-                return 1;
-            }
-
-            @Override
-            public void retry(VolleyError error) throws VolleyError {
-
-            }
-        });
+       stringRequest.setRetryPolicy(customRetryPolicy);
 
         requestQueue.add(stringRequest);
     }
@@ -153,22 +139,7 @@ public class APIClient {
 
 
         });
-        stringRequest.setRetryPolicy(new RetryPolicy() {
-            @Override
-            public int getCurrentTimeout() {
-                return 10000;
-            }
-
-            @Override
-            public int getCurrentRetryCount() {
-                return 0;
-            }
-
-            @Override
-            public void retry(VolleyError error) throws VolleyError {
-
-            }
-        });
+        stringRequest.setRetryPolicy(customRetryPolicy);
 
         requestQueue.add(stringRequest);
     }

@@ -89,7 +89,7 @@ public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.CourseVi
         public void bind(Lesson lesson) {
             binding.txtLessonTitle.setText(lesson.getTitle());
             binding.txtNestedLectureLength.setText(lesson.getDuration() + " Min");
-            if(lesson.is_downloaded) {
+            if(lesson.is_downloaded || lesson.getVideo_url_web().contains("youtube")) {
                 binding.ivDownload.setAlpha(0f);
                 binding.ivDownload.setEnabled(false);
             }

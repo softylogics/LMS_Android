@@ -12,7 +12,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-//        registerListener();
+        registerListener();
     }
     private void registerListener() {
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
