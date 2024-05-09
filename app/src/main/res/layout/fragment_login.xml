@@ -19,7 +19,7 @@
       android:id="@+id/txtview"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="Log in"
+      android:text="@string/log_in"
       android:fontFamily="@font/roboto_medium"
       android:textSize="25sp"
       android:textColor="@color/black"
@@ -35,7 +35,7 @@
       app:boxStrokeWidthFocused="0dp"
 
       app:hintEnabled="true"
-      android:hint="Username"
+      android:hint="@string/email"
       app:hintAnimationEnabled="true"
      android:layout_marginBottom="10dp"
       >
@@ -51,7 +51,8 @@
         android:textSize="12sp"
 
 
-        android:background="@drawable/edittextbg"/>
+        android:background="@drawable/edittextbg"
+        android:autofillHints="emailAddress" />
   </com.google.android.material.textfield.TextInputLayout>
   <com.google.android.material.textfield.TextInputLayout
       android:id="@+id/passwordLayout"
@@ -59,7 +60,7 @@
       android:layout_height="wrap_content"
       app:passwordToggleEnabled="true"
       app:hintEnabled="true"
-      android:hint="Password"
+      android:hint="@string/password"
       app:boxStrokeWidth="0dp"
       app:boxStrokeWidthFocused="0dp"
       >
@@ -72,7 +73,8 @@
         android:inputType="textPassword"
         android:fontFamily="@font/roboto"
         android:textSize="12sp"
-        android:background="@drawable/edittextbg"/>
+        android:background="@drawable/edittextbg"
+        android:autofillHints="password" />
   </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -97,7 +99,7 @@
         android:layout_marginBottom="5dp"
         android:background="@drawable/btnbg"
         android:backgroundTint="@color/primary"
-        android:text="Login"
+        android:text="@string/login"
         android:layout_gravity="center_horizontal"
         android:textColor="@color/textColor" />
 
