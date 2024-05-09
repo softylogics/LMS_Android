@@ -28,6 +28,7 @@ import com.dusre.lms.model.DownloadedLesson;
 import com.dusre.lms.model.DownloadedSection;
 import com.dusre.lms.model.DownloadedVideo;
 import com.dusre.lms.viewmodel.DownloadedVideoViewModel;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 
 import java.io.File;
@@ -208,4 +209,11 @@ public class DownloadedVideoFragment extends Fragment implements SetOnClickListe
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+        crashlytics.setCustomKey("fragment", "DownloadVideoFragment");
+
+    }
 }

@@ -8,11 +8,14 @@ import android.view.WindowManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        registerListener();
+        FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
     }
     private void registerListener() {
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {

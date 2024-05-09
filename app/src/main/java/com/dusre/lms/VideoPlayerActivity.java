@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager.LayoutParams;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Toast;
@@ -36,6 +38,7 @@ import com.dusre.lms.viewmodel.CoursesViewModel;
 import com.dusre.lms.viewmodel.DownloadedVideoViewModel;
 import com.dusre.lms.viewmodel.LessonsViewModel;
 import com.dusre.lms.viewmodel.SectionsViewModel;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.customui.DefaultPlayerUiController;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.customui.PlayerUiController;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants;
@@ -68,6 +71,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements SetOnClick
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = FragmentPlayerLayoutBinding.inflate(getLayoutInflater());
+       // getWindow().setFlags(LayoutParams.FLAG_SECURE, LayoutParams.FLAG_SECURE);
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
         CoursesViewModel coursesViewModel = new ViewModelProvider(this).get(CoursesViewModel.class);
@@ -745,6 +749,14 @@ public class VideoPlayerActivity extends AppCompatActivity implements SetOnClick
         else {
             super.onBackPressed();
         }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+        crashlytics.setCustomKey("Activity", "VideoPlayer");
 
     }
 }

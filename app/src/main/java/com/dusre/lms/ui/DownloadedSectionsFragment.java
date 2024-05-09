@@ -26,6 +26,7 @@ import com.dusre.lms.listeners.SetOnClickListener;
 
 import com.dusre.lms.model.DownloadedCourse;
 import com.dusre.lms.viewmodel.DownloadedVideoViewModel;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 
 public class DownloadedSectionsFragment extends Fragment implements SetOnClickListener {
@@ -155,4 +156,11 @@ public class DownloadedSectionsFragment extends Fragment implements SetOnClickLi
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+        crashlytics.setCustomKey("fragment", "DownloadSections");
+
+    }
 }

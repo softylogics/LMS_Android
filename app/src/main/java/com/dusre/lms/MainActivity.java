@@ -31,6 +31,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.dusre.lms.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -110,6 +111,14 @@ public void disableBottomNav(){
     public boolean onSupportNavigateUp() {
 
         return navController.navigateUp();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+        crashlytics.setCustomKey("Activity", "Main");
 
     }
 }

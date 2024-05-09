@@ -22,6 +22,7 @@ import com.dusre.lms.R;
 import com.dusre.lms.Util.Constants;
 import com.dusre.lms.Util.UserPreferences;
 import com.dusre.lms.databinding.FragmentAccountBinding;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 public class AccountFragment extends Fragment {
 
@@ -53,6 +54,13 @@ public class AccountFragment extends Fragment {
             getActivity().finish();
 
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+        crashlytics.setCustomKey("fragment", "Account");
     }
 
     @Override

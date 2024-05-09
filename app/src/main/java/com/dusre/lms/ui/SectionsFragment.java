@@ -9,10 +9,12 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
@@ -21,6 +23,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,6 +64,7 @@ import com.dusre.lms.model.Section;
 import com.dusre.lms.viewmodel.LessonsViewModel;
 import com.dusre.lms.viewmodel.SectionsViewModel;
 import com.dusre.lms.viewmodel.CoursesViewModel;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -153,79 +157,20 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 
         dbHelper = new DatabaseHelper(getContext());
         myVolleyApiClient = new APIClient(getContext());
-//         downloadCompleteReceiver = new DownloadCompleteReceiver();
-//        onDownloadComplete = new BroadcastReceiver() {
+
+
+//        onDownloadNotoficationClicked = new BroadcastReceiver() {
 //            @Override
 //            public void onReceive(Context context, Intent intent) {
-//                //Fetching the download id received with the broadcast
 //                long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-//                //Checking if the received broadcast is for our enqueued download by matching download id
 //                if (downloadID == id) {
-//                    handleDownloadCompletion(context, downloadID);
-////                    Log.d("download", "in if receiver");
-////                    DownloadManager.Query query = new DownloadManager.Query();
-////                    query.setFilterById(downloadID);
-////
-////                    Cursor cursor = downloadManager.query(query);
-////                    if (cursor.moveToFirst()) {
-////
-////                        int statusIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
-////                        int status = cursor.getInt(statusIndex);
-////                        Log.d("download" , status+"");
-////                        Log.d("download" , statusIndex+"");
-////
-////                        if (status == DownloadManager.STATUS_SUCCESSFUL) {
-////                            // Download completed successfully
-////                            Log.d("download", "in if if receiver");
-////                            String filePath = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-////                            cursor.close();
-////                            downloadedVideo.setVideo_file_path(filePath);
-////                            downloadedVideo.setUpdateOnServer("0");
-////                            dbHelper.addDownloadedVideo(downloadedVideo);
-////                            // Handle successful download
-////                            Toast.makeText(getContext(), "Download Completed. You can find it in Downloaded lectures.", Toast.LENGTH_LONG).show();
-////                            hideDownloadProgressBar();
-////
-////                            binding.progressBarCourseDetail.setVisibility(View.VISIBLE);
-////                            ((MainActivity) requireActivity()).disableBottomNav();
-////                            updateLessonOnServer();
-////                        } else if (status == DownloadManager.STATUS_FAILED) {
-////                            // Download failed
-////                            // Handle download failure
-////                            hideDownloadProgressBar();
-////                            Toast.makeText(getContext(), "Download Failed", Toast.LENGTH_SHORT).show();
-////                        } else if (status == DownloadManager.STATUS_PAUSED) {
-////                            // Download paused
-////                            // Handle download pause
-////                            Toast.makeText(getContext(), "Download Paused", Toast.LENGTH_SHORT).show();
-////                        }
-////                        // Retrieve the file path
-////
-////                        // Store the file path for later access (e.g., in SharedPreferences)
-////                        // Here, for simplicity, we'll just use a class-level variable
-////
-////                }
+//
+//                        Toast.makeText(context, "Download Notification Clicked", Toast.LENGTH_SHORT).show();
+//
 //                }
-//                lesson_id = -1;
-//                downloadID = -1;
 //            }
-//
-//
 //        };
-//        requireActivity().registerReceiver(downloadCompleteReceiver,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-
-        onDownloadNotoficationClicked = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-                if (downloadID != id) {
-
-                        Toast.makeText(context, "Download Notification Clicked", Toast.LENGTH_SHORT).show();
-
-                }
-            }
-        };
-        requireActivity().registerReceiver(onDownloadNotoficationClicked,new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));
+//        requireActivity().registerReceiver(onDownloadNotoficationClicked,new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));
 
 
         return root;
@@ -383,8 +328,12 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
                     Intent serviceIntent = new Intent(getContext(), DownloadService.class);
                     serviceIntent.putExtra("url", lesson.getVideo_url_web());
                     requireActivity().startService(serviceIntent);
+                    Intent intent = new Intent(getContext(), DownloadService.class);
+                    requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
                 }
                 else{
+
+                    //mService.cancelDownload();
                     Toast.makeText(getContext(), "Already Downloading", Toast.LENGTH_SHORT).show();
                 }
 //                beginDownload(lesson.getVideo_url_web());
@@ -396,7 +345,24 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
 //        }
     }
 
+    private DownloadService mService;
+    private boolean mBound = false;
+    private ServiceConnection connection = new ServiceConnection() {
 
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance.
+            DownloadService.LocalBinder binder = (DownloadService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
 private void beginDownload(String url){
     if (downloadID == -1) {
 //        showDownloadProgressBar();
@@ -540,164 +506,7 @@ private void beginDownload(String url){
         return false;
     }
 
-//    class DownloadFileFromURL extends AsyncTask<String, String, String> {
-//
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//            showDialog();
-//        }
-//
-//
-//        @Override
-//        protected String doInBackground(String... f_url) {
-//            int count;
-//            File file = null;
-//            try {
-//                URL url = new URL(f_url[0]);
-//
-//                String decodedURL = java.net.URLDecoder.decode(f_url[0], "UTF-8");
-//                Log.d("url", decodedURL);
-//                String name = decodedURL.substring(f_url[0].lastIndexOf("/"));
-//                URLConnection connection = url.openConnection();
-//                connection.connect();
-//                // getting file length
-//                int lenghtOfFile = connection.getContentLength();
-//
-//                // input stream to read file - with 8k buffer
-//                InputStream input = new BufferedInputStream(url.openStream(), 8192);
-//
-//                // Specify the folder name where you want to save files
-//                String folderName = "DownloadedVideos";
-//
-//// Get the path to the directory in the app's internal storage
-//                File directory = new File(getActivity().getFilesDir(), folderName);
-//
-//// Check if the directory already exists, if not, create it
-//                if (!directory.exists()) {
-//                    if (directory.mkdirs()) {
-//                        // Directory created successfully or already exists
-//                        // Now you can save files into this directory
-//                        // Create a new file in the specified directory
-//                            file = new File(directory, name);
-//
-//                        // Output stream to write file
-//                        OutputStream output = new FileOutputStream(file);
-//
-//                        byte data[] = new byte[1024];
-//
-//                        long total = 0;
-//
-//                        while ((count = input.read(data)) != -1) {
-//                            total += count;
-//                            // publishing the progress....
-//                            // After this onProgressUpdate will be called
-//                            publishProgress(""+(int)((total*100)/lenghtOfFile));
-//
-//                            // writing data to file
-//                            output.write(data, 0, count);
-//                        }
-//
-//                        // flushing output
-//                        output.flush();
-//
-//                        // closing streams
-//                        output.close();
-//                        input.close();
-//                    } else {
-//                        // Failed to create directory
-//                        // Handle this case according to your app's logic
-//                    }
-//                } else {
-//                    // Directory already exists
-//                    // You can proceed to save files into this directory
-//                    // Create a new file in the specified directory
-//                    file = new File(directory, name);
-//
-//                    // Output stream to write file
-//                    OutputStream output = new FileOutputStream(file);
-//
-//                    byte data[] = new byte[1024];
-//
-//                    long total = 0;
-//
-//                    while ((count = input.read(data)) != -1) {
-//                        total += count;
-//                        // publishing the progress....
-//                        // After this onProgressUpdate will be called
-//                        publishProgress(""+(int)((total*100)/lenghtOfFile));
-//
-//                        // writing data to file
-//                        output.write(data, 0, count);
-//                    }
-//
-//                    // flushing output
-//                    output.flush();
-//
-//                    // closing streams
-//                    output.close();
-//                    input.close();
-//                }
-//
-//
-//
-//            } catch (Exception e) {
-//                Log.e("Error: ", e.getMessage());
-//            }
-//            if(file!=null) {
-//                return file.getAbsolutePath();
-//            }
-//            else{
-//                return null;
-//            }
-//        }
-//
-//        /**
-//         * Updating progress bar
-//         * */
-//        protected void onProgressUpdate(String... progress) {
-//            // setting progress percentage
-//            pDialog.setProgress(Integer.parseInt(progress[0]));
-//        }
-//
-//        /**
-//         * After completing background task
-//         * Dismiss the progress dialog
-//         * **/
-//        @Override
-//        protected void onPostExecute(String file_url) {
-//            // dismiss the dialog after the file was downloaded
-//
-//
-//            // Find the index of "/files/"
-//            int filesIndex = file_url.indexOf("/files/");
-//
-//                // Extract the substring after "/files/"
-//                String substringAfterFiles = file_url.substring(filesIndex + "/files/".length());
-//
-//
-//            downloadedVideo.setVideo_file_path(substringAfterFiles);
-//            dbHelper.addDownloadedVideo(downloadedVideo);
-//            pDialog.dismiss();
-//
-//        }
-//        @Override
-//        protected void onCancelled(String file_url) {
-//            // If the download was cancelled, you can clean up resources here
-//            // Delete the partially downloaded file if it exists
-//            if (file_url != null) {
-//                File file = new File(file_url);
-//                if (file.exists()) {
-//                    file.delete();
-//                }
-//            }
-//            dbHelper.deleteDownloadedVideo(videoId);
-//            // Dismiss the progress dialog
-//            pDialog.dismiss();
-//        }
-//
-//    }
+
 
     private int checkInternet() {
         int result = 0; // Returns connection type. 0: none; 1: mobile data; 2: wifi
@@ -764,9 +573,16 @@ private void beginDownload(String url){
                 }
             }
         };
-        requireActivity().getOnBackPressedDispatcher().addCallback(getActivity(), callback);
+        requireActivity().getOnBackPressedDispatcher().addCallback(requireActivity(), callback);
 
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+        crashlytics.setCustomKey("fragment", "SectionsFragment");
+
+    }
 }

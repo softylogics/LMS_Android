@@ -31,6 +31,7 @@ import com.dusre.lms.databinding.FragmentMyCourseBinding;
 import com.dusre.lms.listeners.SetOnClickListener;
 import com.dusre.lms.model.Course;
 import com.dusre.lms.viewmodel.CoursesViewModel;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -287,5 +288,8 @@ public class MyCourseFragment extends Fragment implements SetOnClickListener {
         if (updateApp != null) {
             updateApp.resumeUpdate();
         }
+        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+        crashlytics.setCustomKey("fragment", "MyCourseFragment");
+
     }
 }

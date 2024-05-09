@@ -27,4 +27,6 @@ public class Constants {
 
     public static String lesson_id_for_post_download_service = "lesson_id_for_post_download_service";
     public static boolean downloading = false;
+
+    public static String FETCHING = "fetching";
 }

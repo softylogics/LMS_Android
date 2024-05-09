@@ -20,6 +20,7 @@ import com.dusre.lms.Util.Constants;
 import com.dusre.lms.Util.UserPreferences;
 import com.dusre.lms.databinding.FragmentLoginBinding;
 import com.dusre.lms.model.Section;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -170,4 +171,11 @@ public class LoginActivity extends AppCompatActivity {
             public String token;
         }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+        crashlytics.setCustomKey("Activity", "Login");
+
+    }
 }

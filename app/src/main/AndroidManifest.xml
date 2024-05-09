@@ -64,7 +64,9 @@
 <!--                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />-->
 <!--            </intent-filter>-->
 <!--        </receiver>-->
-        <service android:name=".Util.DownloadService"/>
+        <service android:name=".Util.DownloadService"
+            android:stopWithTask="true"
+            android:exported="false"/>
 
 
     </application>

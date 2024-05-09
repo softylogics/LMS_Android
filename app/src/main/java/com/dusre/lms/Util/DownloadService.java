@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
@@ -18,6 +19,7 @@ import com.dusre.lms.model.CourseForPostDownloadService;
 import com.dusre.lms.model.DownloadedVideo;
 import com.dusre.lms.model.Lesson;
 import com.dusre.lms.model.Section;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -31,9 +33,16 @@ import java.util.UUID;
  *
  */
 public class DownloadService extends Service {
+    private final IBinder binder = new LocalBinder();
 
+    public class LocalBinder extends Binder {
+        public DownloadService getService() {
+            // Return this instance of LocalService so clients can call public methods.
+            return DownloadService.this;
+        }
+    }
     // BroadcastReceiver to handle download completion
-    private final BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Check if the download was successful
@@ -99,10 +108,14 @@ public class DownloadService extends Service {
     private String sectionTitle;
     private String courseTitle;
     private DownloadManager downloadManager;
+    private FirebaseCrashlytics crashlytics;
+    private boolean taskRemovedCalled = false;
+
 
     @Override
     public void onCreate() {
         super.onCreate();
+        crashlytics = FirebaseCrashlytics.getInstance();
         // Register the receiver for download completion
         registerReceiver(downloadReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
@@ -190,7 +203,7 @@ public class DownloadService extends Service {
                 Constants.downloading = false;
                 //sectionsAdapter.reload();
                 Log.d("API Response", response);
-                //todo: develop a mechanism to tell the app that server db is uodated
+                //todo: develop a mechanism to tell the app that server db is updated
                 stopSelf();
             }
 
@@ -282,25 +295,38 @@ public class DownloadService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.d("post download", "service destroyed");
+        Log.d("service", "service destroyed");
         //downloadManager.remove(downloadID);
         // Unregister the receiver when the service is destroyed
-        unregisterReceiver(downloadReceiver);
+        crashlytics.setCustomKey("taskRemovedCalled", taskRemovedCalled);
+        cancelDownload();
+       unregisterMyBroadcastReceiver();
         super.onDestroy();
     }
-
+    private void unregisterMyBroadcastReceiver() {
+        if (null != downloadReceiver) {
+            unregisterReceiver(downloadReceiver);
+            downloadReceiver = null;
+        }
+    }
     @Override
     public IBinder onBind(Intent intent) {
-        return null; // We don't provide binding, so return null
+        return binder; // We don't provide binding, so return null
     }
-    private void cancelDownload() {
-        downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-        downloadManager.remove(downloadID); // Cancel the download
+    public void cancelDownload() {
+        if(Constants.downloading) {
+            Log.d("service" , "cancel download");
+            downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+            downloadManager.remove(downloadID); // Cancel the download
+            Constants.downloading = false;
+        }
     }
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        unregisterReceiver(downloadReceiver);
+        Log.d("service" , "taskRemovedCalled");
+        taskRemovedCalled = true;
         cancelDownload();
+        unregisterMyBroadcastReceiver();
         stopSelf();
     }
 
