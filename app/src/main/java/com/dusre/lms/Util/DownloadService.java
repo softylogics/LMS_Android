@@ -254,7 +254,7 @@ public class DownloadService extends Service {
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url))
 
                     .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)// Visibility of the download Notification
-                    .setDestinationInExternalFilesDir(getApplicationContext(), getApplicationContext().getFilesDir().getAbsolutePath(), fileName)
+                    .setDestinationInExternalFilesDir(getApplicationContext(), getApplicationContext().getFilesDir().getAbsolutePath(), fileName) //todo: change to getFilesDir and add support for both internal and external storage
                     .setTitle(fileName)// Title of the Download Notification
                     .setDescription("Downloading")// Description of the Download Notification
                     .setAllowedOverMetered(true)// Set if download is allowed on Mobile network

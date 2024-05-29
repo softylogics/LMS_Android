@@ -7,22 +7,18 @@ import static android.content.Context.DOWNLOAD_SERVICE;
 import android.Manifest;
 import android.app.Activity;
 import android.app.DownloadManager;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,7 +29,6 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -50,7 +45,6 @@ import com.dusre.lms.Util.Constants;
 import com.dusre.lms.Util.DatabaseHelper;
 
 import com.dusre.lms.Util.DownloadService;
-import com.dusre.lms.Util.PostDownloadService;
 import com.dusre.lms.Util.UserPreferences;
 import com.dusre.lms.VideoPlayerActivity;
 import com.dusre.lms.adapters.SectionsAdapter;
@@ -72,7 +66,8 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Objects;
+
 //todo: if user closes app during download
 public class SectionsFragment extends Fragment implements SetOnClickListener {
 
@@ -125,12 +120,7 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         sectionsAdapter = new SectionsAdapter(requireContext(), sectionsViewModel, this);
         sectionsViewModel.getSections().setValue(null);
 
-        Course course = coursesViewModel.getMyCourses().getValue().get(Constants.current_course_id);
-        binding.txtCourseTitleDetail.setText(course.getTitle());
-        binding.courseDetailCompletedLectures.setText(course.getTotal_number_of_completed_lessons() + "/" + course.getTotal_number_of_lessons());
-        binding.courseDetailProgressBarLabel.setText(course.getCompletion()+"% Complete");
-        binding.courseDetailProgressBar.setProgress(calculateProgress(course));
-        binding.recyclerViewCourseDetail.setAdapter(sectionsAdapter);
+
         gson = new Gson();
 
         // Populate course list (You may fetch it from database or API)
@@ -176,60 +166,19 @@ public class SectionsFragment extends Fragment implements SetOnClickListener {
         return root;
     }
 
-    private void handleDownloadCompletion(Context context, long downloadID) {
-        // Perform actions after download completes (e.g., process the downloaded file)
-        // You can start a service or perform any necessary background processing here
-        // For example, launch a service to handle post-download tasks
-        Intent serviceIntent = new Intent(context, PostDownloadService.class);
-        serviceIntent.putExtra("downloadId", downloadID);
-        serviceIntent.putExtra("lesson_id", lesson_id);
-        context.startService(serviceIntent);
-    }
 
-    private void updateLessonOnServer() {
-        updatingOnServer = true;
-        APIClient.ApiResponseListener listener = new APIClient.ApiResponseListener() {
-            @Override
-            public void onSuccess(String response) {
-
-
-                //sectionsAdapter.reload();
-                Log.d("API Response", response);
-                ((MainActivity) requireActivity()).enableBottomNav();
-                callAPIForCoursesSections();
-
-                updatingOnServer = false;
-            }
-
-            @Override
-            public void onFailure(VolleyError error) {
-                //todo: handle video deletion/updating the server whenever possible if not successful in first go
-
-                binding.progressBarCourseDetail.setVisibility(View.GONE);
-
-                Log.d("API Response", error.toString());
-
-
-                updatingOnServer = false;
-            }
-        };
-        Map<String, String> params = new HashMap<>();
-        params.put("auth_token", UserPreferences.getString(Constants.TOKEN));
-        params.put("lesson_id", String.valueOf(lesson_id));
-
-        params.put("status", String.valueOf("1"));
-
-        myVolleyApiClient.saveDownloadProgress(Constants.url+"lesson_downloaded", params, listener);
-
-
-
-    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
         implementBackButtonFunctionality(view);
+        Course course = Objects.requireNonNull(coursesViewModel.getMyCourses().getValue()).get(Constants.current_course_id);
+        binding.txtCourseTitleDetail.setText(course.getTitle());
+        binding.courseDetailCompletedLectures.setText(course.getTotal_number_of_completed_lessons() + "/" + course.getTotal_number_of_lessons());
+        binding.courseDetailProgressBarLabel.setText(course.getCompletion()+"% Complete");
+        binding.courseDetailProgressBar.setProgress(calculateProgress(course));
+        binding.recyclerViewCourseDetail.setAdapter(sectionsAdapter);
 
 //        navController = Navigation.findNavController(view);
     }
